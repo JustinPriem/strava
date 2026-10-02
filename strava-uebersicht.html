@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: ein Trainingsbuch auf einer Spalte. Urteil oben, dann Belege je Sportart, unten Jahresvergleich und Meilensteine. */
+/* Layout: ein Trainingsbuch auf einer Spalte. Urteil oben, darunter Tabs je Sportart mit Kennzahlen, Diagrammen, Bewertung und Liste. */
 :root {
   --bg: #f6f7f4;
   --surface: #fcfcfb;
@@ -15,7 +15,8 @@
   --ring: rgba(18,22,15,0.10);
   --run: #2a78d6;
   --ride: #eb6834;
-  --other: #1baf7a;
+  --swim: #1baf7a;
+  --other: #898781;
   --run-soft: rgba(42,120,214,0.14);
   --good: #006300;
   --good-bg: rgba(12,163,12,0.10);
@@ -29,7 +30,7 @@
   :root:not([data-theme="light"]) {
     --bg: #0f110e; --surface: #181a17; --ink: #f4f5f1; --ink-2: #c3c6bb; --muted: #8b8f84;
     --grid: #2a2d28; --axis: #3a3d36; --ring: rgba(255,255,255,0.10);
-    --run: #3987e5; --ride: #d95926; --other: #199e70; --run-soft: rgba(57,135,229,0.20);
+    --run: #3987e5; --ride: #d95926; --swim: #199e70; --other: #898781; --run-soft: rgba(57,135,229,0.20);
     --good: #3cc23c; --good-bg: rgba(12,163,12,0.16); --warn-ink: #f2c04a; --warn-bg: rgba(250,178,25,0.14);
     color-scheme: dark;
   }
@@ -37,7 +38,7 @@
 :root[data-theme="dark"] {
   --bg: #0f110e; --surface: #181a17; --ink: #f4f5f1; --ink-2: #c3c6bb; --muted: #8b8f84;
   --grid: #2a2d28; --axis: #3a3d36; --ring: rgba(255,255,255,0.10);
-  --run: #3987e5; --ride: #d95926; --other: #199e70; --run-soft: rgba(57,135,229,0.20);
+  --run: #3987e5; --ride: #d95926; --swim: #199e70; --other: #898781; --run-soft: rgba(57,135,229,0.20);
   --good: #3cc23c; --good-bg: rgba(12,163,12,0.16); --warn-ink: #f2c04a; --warn-bg: rgba(250,178,25,0.14);
   color-scheme: dark;
 }
@@ -121,7 +122,35 @@ details summary:focus-visible { outline: 2px solid var(--run); outline-offset: 2
 details .tablewrap { border: 0; border-top: 1px solid var(--grid); border-radius: 0 0 10px 10px; max-height: 420px; overflow: auto; }
 footer { font-size: 13px; color: var(--muted); }
 
+
+/* Tabs */
+.tabbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); display: flex; gap: 4px; border-bottom: 1px solid var(--grid); overflow-x: auto; scrollbar-width: none; margin-bottom: -24px; }
+.tabbar::-webkit-scrollbar { display: none; }
+.tabbar button { appearance: none; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; padding: 12px 14px 10px; font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: 0.01em; color: var(--muted); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.tabbar button i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); display: inline-block; }
+.tabbar button:hover { color: var(--ink-2); }
+.tabbar button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--c); }
+.tabbar button:focus-visible { outline: 2px solid var(--run); outline-offset: -2px; border-radius: 6px; }
+.tabbar .count { font-family: var(--font-data); font-size: 11px; font-weight: 400; color: var(--muted); }
+.panel { display: flex; flex-direction: column; gap: 48px; }
+.panel:focus-visible { outline: none; }
+.panel[hidden] { display: none; }
+.tiles.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.vcol.single { grid-column: 1 / -1; }
+.hbars { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.hbar { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr) 76px; gap: 12px; align-items: center; font-size: 14px; }
+.hbar .name { color: var(--ink-2); min-width: 0; }
+.hbar .name small { display: block; font-family: var(--font-data); font-size: 11px; color: var(--muted); }
+.hbar .track { height: 14px; background: var(--grid); border-radius: 0 4px 4px 0; position: relative; }
+.hbar .fill { height: 100%; background: var(--swim); border-radius: 0 4px 4px 0; }
+.hbar .val { font-family: var(--font-data); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+.hbar.best .val { color: var(--good); font-weight: 500; }
+
 @media (max-width: 720px) {
+  .tiles.three { grid-template-columns: minmax(0, 1fr); }
+  .hbar { grid-template-columns: minmax(0, 1fr) 70px; }
+  .hbar .track { grid-column: 1 / -1; grid-row: 2; }
+  .tabbar button { font-size: 18px; padding-inline: 10px; }
   .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .verdict { grid-template-columns: minmax(0, 1fr); }
   .miles li { grid-template-columns: minmax(0, 1fr); }
@@ -135,94 +164,227 @@ footer { font-size: 13px; color: var(--muted); }
   <header class="hero">
     <div class="eyebrow">Strava · Bad Berka · Dez 2023 bis Sep 2026 · <span id="countAll"></span> Aktivitäten</div>
     <h1>Klarer <span class="up">Fortschritt</span>, vor allem beim Laufen</h1>
-    <p class="lede">Auf deiner 5-km-Hausrunde bist du heute rund 1:24 min pro Kilometer schneller als bei deinem besten Lauf 2025. Auf dem Rad fährst du deutlich weiter als früher, das Tempo hat sich aber kaum verändert. Seit Juni 2026 ist das Rad fast aus deinem Training verschwunden.</p>
-    <div class="tiles" id="tiles"></div>
+    <p class="lede">Auf deiner 5-km-Hausrunde bist du heute rund 1:24 min pro Kilometer schneller als bei deinem besten Lauf 2025. Auf dem Rad fährst du deutlich weiter als früher, das Tempo hat sich aber kaum verändert. Beim Schwimmen hast du im Juli 2026 gerade erst angefangen.</p>
   </header>
 
-  <section>
-    <header>
-      <div class="eyebrow">Umfang</div>
-      <h2>Bewegungszeit pro Monat</h2>
-      <p class="note">Laufen, Rad und Sonstiges (Schwimmen, Inliner) in Stunden. 2026 ist dein mit Abstand aktivstes Jahr, nach einer Winterpause von September 2025 bis März 2026.</p>
-    </header>
-    <div class="chart" id="volChart">
-      <div class="legend"><span><i style="background:var(--run)"></i>Laufen</span><span><i style="background:var(--ride)"></i>Rad</span><span><i style="background:var(--other)"></i>Sonstiges</span></div>
-    </div>
-    <p class="note">Die „Workout“-Einträge aus Dez 2023 und Jan 2024 fehlen hier, weil einige davon unrealistische Dauern haben (bis zu 18 Stunden).</p>
-  </section>
+  <nav class="tabbar" role="tablist" aria-label="Sportarten">
+    <button role="tab" id="tab-gesamt" aria-controls="gesamt" aria-selected="true" style="--c:var(--ink)"><i></i>Gesamt</button>
+    <button role="tab" id="tab-laufen" aria-controls="laufen" aria-selected="false" tabindex="-1" style="--c:var(--run)"><i></i>Laufen <span class="count" id="cRun"></span></button>
+    <button role="tab" id="tab-radfahren" aria-controls="radfahren" aria-selected="false" tabindex="-1" style="--c:var(--ride)"><i></i>Radfahren <span class="count" id="cRide"></span></button>
+    <button role="tab" id="tab-schwimmen" aria-controls="schwimmen" aria-selected="false" tabindex="-1" style="--c:var(--swim)"><i></i>Schwimmen <span class="count" id="cSwim"></span></button>
+  </nav>
 
-  <section>
-    <header>
-      <div class="eyebrow">Laufen</div>
-      <h2>Tempo auf der Hausrunde <span class="tag good">Fortschritt</span></h2>
-      <p class="note">Alle Läufe auf deiner Standardrunde in Bad Berka (4,7 bis 5,5 km, 55 bis 80 Höhenmeter), damit Strecke und Profil vergleichbar sind. Höher heißt schneller. Die Linie ist der Median der letzten fünf Läufe.</p>
-    </header>
-    <div class="chart" id="paceChart">
-      <div class="legend"><span><i class="dot" style="background:var(--run)"></i>Einzelner Lauf</span><span><i class="line" style="background:var(--ink-2)"></i>Gleitender Median (5 Läufe)</span></div>
-    </div>
-  </section>
+  <!-- ============ GESAMT ============ -->
+  <div class="panel" id="gesamt" role="tabpanel" aria-labelledby="tab-gesamt" tabindex="0">
+    <div class="tiles" id="tilesAll"></div>
 
-  <section>
-    <header>
-      <div class="eyebrow">Rad</div>
-      <h2>Durchschnittstempo je Fahrt <span class="tag mixed">Gemischt</span></h2>
-      <p class="note">Alle Fahrten über 10 km. Die Punktgröße zeigt die Distanz. Die schnellsten Runden waren kurze, flache Abendfahrten im Sommer 2025. 2026 fährst du längere Strecken bei ähnlichem Tempo.</p>
-    </header>
-    <div class="chart" id="rideChart">
-      <div class="legend"><span><i class="dot" style="background:var(--ride)"></i>Fahrt (Größe = Distanz)</span></div>
-    </div>
-  </section>
-
-  <section>
-    <header>
-      <div class="eyebrow">Urteil</div>
-      <h2>Fortschritt oder Rückschritt?</h2>
-    </header>
-    <div class="verdict">
-      <div class="vcol good">
-        <h3><span class="mark">↑</span>Fortschritt</h3>
-        <ul>
-          <li><strong>Lauftempo:</strong> Bestzeit auf der Hausrunde von 6:24 /km (2025) auf 5:00 /km (30.09.2026). Der typische Lauf liegt jetzt bei rund 6:00 statt 6:50 /km.</li>
-          <li><strong>Laufumfang:</strong> 272 km in 2026 gegenüber 54 km in 2025, also fünfmal so viel.</li>
-          <li><strong>Laufdistanz:</strong> erster Halbmarathon (21,3 km) am 05.04.2026, dazu mehrere 10-km-Läufe.</li>
-          <li><strong>Rad-Ausdauer:</strong> längste Fahrt von 189 km auf 265 km. Drei Tage Amsterdam mit 607 km. Fahrten über 100 km liegen 2026 im Median bei 21,5 km/h statt 19,7 km/h.</li>
-          <li><strong>Regelmäßigkeit:</strong> zuletzt 1 bis 3 Läufe pro Woche ohne längere Lücken.</li>
-        </ul>
+    <section>
+      <header>
+        <div class="eyebrow">Umfang</div>
+        <h2>Bewegungszeit pro Monat</h2>
+        <p class="note">Alle Sportarten in Stunden. 2026 ist dein mit Abstand aktivstes Jahr, nach einer Winterpause von September 2025 bis März 2026.</p>
+      </header>
+      <div class="chart" id="volChart">
+        <div class="legend"><span><i style="background:var(--run)"></i>Laufen</span><span><i style="background:var(--ride)"></i>Radfahren</span><span><i style="background:var(--swim)"></i>Schwimmen</span><span><i style="background:var(--other)"></i>Inliner</span></div>
       </div>
-      <div class="vcol mixed">
-        <h3><span class="mark">→</span>Stagnation und Rückgang</h3>
-        <ul>
-          <li><strong>Rad seit Juni 2026:</strong> von Juli bis September nur 2 Fahrten. 2025 waren es im selben Zeitraum 15.</li>
-          <li><strong>Kurze schnelle Runden:</strong> die flachen Abendrunden aus dem Sommer 2025 (bis Ø 32,6 km/h bei „All In“) hast du 2026 nicht wiederholt. Ob du dort schwächer bist, lässt sich daher nicht sagen.</li>
-          <li><strong>Winterpause:</strong> zwischen 27.08.2025 und 21.03.2026 ist nichts aufgezeichnet. Nach dem Winter ging es beim Laufen trotzdem schneller weiter als vorher.</li>
-          <li><strong>Lockere Läufe:</strong> im August und September sind mehr ruhige Läufe dabei (mit Hund, flachere Strecken). Das senkt den Durchschnitt, ist aber kein Leistungsverlust.</li>
-        </ul>
+      <p class="note">Die „Workout“-Einträge aus Dez 2023 und Jan 2024 fehlen hier, weil einige davon unrealistische Dauern haben (bis zu 18 Stunden).</p>
+    </section>
+
+    <section>
+      <header>
+        <div class="eyebrow">Urteil</div>
+        <h2>Fortschritt oder Rückschritt?</h2>
+      </header>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Sportart</th><th style="text-align:left">Trend</th><th style="text-align:left">Wichtigster Beleg</th></tr></thead>
+        <tbody>
+          <tr><td>Laufen</td><td style="text-align:left"><span class="tag good">Fortschritt</span></td><td style="text-align:left;white-space:normal">Hausrunde von 6:24 auf 5:00 /km, fünfmal so viele Kilometer</td></tr>
+          <tr><td>Radfahren</td><td style="text-align:left"><span class="tag mixed">Gemischt</span></td><td style="text-align:left;white-space:normal">Längere Touren (265 km), aber seit Juni 2026 kaum noch Fahrten</td></tr>
+          <tr><td>Schwimmen</td><td style="text-align:left"><span class="tag mixed">Zu früh</span></td><td style="text-align:left;white-space:normal">Zwei Einheiten, erste Tendenz von 2:58 auf 2:40 /100 m</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section>
+      <header>
+        <div class="eyebrow">Chronik</div>
+        <h2>Meilensteine</h2>
+      </header>
+      <ol class="miles" id="miles"></ol>
+    </section>
+
+    <section>
+      <details>
+        <summary>Alle <span id="countAll2"></span> Aktivitäten als Tabelle</summary>
+        <div class="tablewrap"><table id="allTable"></table></div>
+      </details>
+    </section>
+  </div>
+
+  <!-- ============ LAUFEN ============ -->
+  <div class="panel" id="laufen" role="tabpanel" aria-labelledby="tab-laufen" tabindex="0" hidden>
+    <div class="tiles" id="tilesRun"></div>
+
+    <section>
+      <header>
+        <div class="eyebrow">Tempo</div>
+        <h2>Tempo auf der Hausrunde <span class="tag good">Fortschritt</span></h2>
+        <p class="note">Alle Läufe auf deiner Standardrunde in Bad Berka (4,7 bis 5,5 km, 55 bis 80 Höhenmeter), damit Strecke und Profil vergleichbar sind. Höher heißt schneller. Die Linie ist der Median der letzten fünf Läufe.</p>
+      </header>
+      <div class="chart" id="paceChart">
+        <div class="legend"><span><i class="dot" style="background:var(--run)"></i>Einzelner Lauf</span><span><i class="line" style="background:var(--ink-2)"></i>Gleitender Median (5 Läufe)</span></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <header>
-      <div class="eyebrow">Jahresvergleich</div>
-      <h2>Zahlen pro Jahr</h2>
-    </header>
-    <div class="tablewrap"><table id="yearTable"></table></div>
-  </section>
+    <section>
+      <header>
+        <div class="eyebrow">Umfang</div>
+        <h2>Laufkilometer pro Monat</h2>
+        <p class="note">Seit März 2026 läufst du jeden Monat zwischen 23 und 66 km. Davor waren es nie mehr als 25 km im Monat.</p>
+      </header>
+      <div class="chart" id="runVol"></div>
+    </section>
 
-  <section>
-    <header>
-      <div class="eyebrow">Chronik</div>
-      <h2>Meilensteine</h2>
-    </header>
-    <ol class="miles" id="miles"></ol>
-  </section>
+    <section>
+      <header>
+        <div class="eyebrow">Bewertung</div>
+        <h2>Was sich beim Laufen getan hat</h2>
+      </header>
+      <div class="verdict">
+        <div class="vcol good">
+          <h3><span class="mark">↑</span>Fortschritt</h3>
+          <ul>
+            <li><strong>Tempo:</strong> Bestwert auf der Hausrunde von 6:24 /km (2025) auf 5:00 /km (30.09.2026). Der Median auf der Hausrunde liegt jetzt bei 5:58 statt 6:42 /km.</li>
+            <li><strong>Umfang:</strong> 272 km in 2026 gegenüber 54 km in 2025, also fünfmal so viel.</li>
+            <li><strong>Distanz:</strong> erster Halbmarathon (21,3 km) am 05.04.2026, dazu mehrere 10-km-Läufe.</li>
+            <li><strong>Regelmäßigkeit:</strong> seit März 2026 jeden Monat mindestens 4 Läufe. Die längste Pause waren knapp 3 Wochen im Juni und Juli.</li>
+          </ul>
+        </div>
+        <div class="vcol mixed">
+          <h3><span class="mark">→</span>Zu beachten</h3>
+          <ul>
+            <li><strong>Lockere Läufe:</strong> im August und September sind mehr ruhige Läufe dabei (mit Hund, flachere Strecken). Das senkt den Durchschnitt, ist aber kein Leistungsverlust.</li>
+            <li><strong>Lange Läufe:</strong> nach dem Halbmarathon im April ging kein Lauf mehr über 10,2 km.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-  <section>
-    <details>
-      <summary>Alle <span id="countAll2"></span> Aktivitäten als Tabelle</summary>
-      <div class="tablewrap"><table id="allTable"></table></div>
-    </details>
-  </section>
+    <section>
+      <header><div class="eyebrow">Jahresvergleich</div><h2>Laufen pro Jahr</h2></header>
+      <div class="tablewrap"><table id="yearRun"></table></div>
+    </section>
+
+    <section>
+      <details>
+        <summary>Alle <span id="cRun2"></span> Läufe als Tabelle</summary>
+        <div class="tablewrap"><table id="runTable"></table></div>
+      </details>
+    </section>
+  </div>
+
+  <!-- ============ RADFAHREN ============ -->
+  <div class="panel" id="radfahren" role="tabpanel" aria-labelledby="tab-radfahren" tabindex="0" hidden>
+    <div class="tiles" id="tilesRide"></div>
+
+    <section>
+      <header>
+        <div class="eyebrow">Tempo</div>
+        <h2>Durchschnittstempo je Fahrt <span class="tag mixed">Gemischt</span></h2>
+        <p class="note">Alle Fahrten über 10 km. Die Punktgröße zeigt die Distanz. Die schnellsten Runden waren kurze, flache Abendfahrten im Sommer 2025. 2026 fährst du längere Strecken bei ähnlichem Tempo.</p>
+      </header>
+      <div class="chart" id="rideChart">
+        <div class="legend"><span><i class="dot" style="background:var(--ride)"></i>Fahrt (Größe = Distanz)</span></div>
+      </div>
+    </section>
+
+    <section>
+      <header>
+        <div class="eyebrow">Umfang</div>
+        <h2>Radkilometer pro Monat</h2>
+        <p class="note">Im Juli 2025 und im Mai 2026 hast du mit den Touren nach Prag und Amsterdam die meisten Kilometer gesammelt. Seit Juli 2026 fährst du kaum noch.</p>
+      </header>
+      <div class="chart" id="rideVol"></div>
+    </section>
+
+    <section>
+      <header>
+        <div class="eyebrow">Bewertung</div>
+        <h2>Was sich auf dem Rad getan hat</h2>
+      </header>
+      <div class="verdict">
+        <div class="vcol good">
+          <h3><span class="mark">↑</span>Fortschritt</h3>
+          <ul>
+            <li><strong>Ausdauer:</strong> längste Fahrt von 189 km auf 265 km. Drei Tage Amsterdam mit 607 km.</li>
+            <li><strong>Tempo auf Langstrecke:</strong> Fahrten über 100 km liegen 2026 im Median bei 21,5 km/h statt 19,7 km/h.</li>
+            <li><strong>Gesamtstrecke:</strong> 1.276 km in 2026 gegenüber 1.047 km in 2025, mit weniger Fahrten.</li>
+          </ul>
+        </div>
+        <div class="vcol mixed">
+          <h3><span class="mark">↓</span>Stagnation und Rückgang</h3>
+          <ul>
+            <li><strong>Seit Juni 2026:</strong> von Juli bis September nur 2 Fahrten. 2025 waren es im selben Zeitraum 15.</li>
+            <li><strong>Kurze schnelle Runden:</strong> die flachen Abendrunden aus dem Sommer 2025 (bis Ø 32,6 km/h bei „All In“) hast du 2026 nicht wiederholt. Ob du dort schwächer bist, lässt sich daher nicht sagen.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <header><div class="eyebrow">Jahresvergleich</div><h2>Radfahren pro Jahr</h2></header>
+      <div class="tablewrap"><table id="yearRide"></table></div>
+    </section>
+
+    <section>
+      <details>
+        <summary>Alle <span id="cRide2"></span> Fahrten als Tabelle</summary>
+        <div class="tablewrap"><table id="rideTable"></table></div>
+      </details>
+    </section>
+  </div>
+
+  <!-- ============ SCHWIMMEN ============ -->
+  <div class="panel" id="schwimmen" role="tabpanel" aria-labelledby="tab-schwimmen" tabindex="0" hidden>
+    <div class="tiles three" id="tilesSwim"></div>
+
+    <section>
+      <header>
+        <div class="eyebrow">Tempo</div>
+        <h2>Zeit pro 100 m <span class="tag mixed">Zu früh</span></h2>
+        <p class="note">Deine Serien im 50-m-Becken aus den Notizen zu den Einheiten. Kürzer heißt schneller.</p>
+      </header>
+      <div class="hbars" id="swimBars"></div>
+    </section>
+
+    <section>
+      <header>
+        <div class="eyebrow">Bewertung</div>
+        <h2>Was sich beim Schwimmen sagen lässt</h2>
+      </header>
+      <div class="verdict">
+        <div class="vcol good">
+          <h3><span class="mark">↑</span>Erste Tendenz</h3>
+          <ul>
+            <li><strong>Tempo:</strong> von 2:58 /100 m in der ersten Einheit auf 2:40 /100 m drei Tage später.</li>
+            <li><strong>Gleichmäßig:</strong> die beiden 500-m-Serien am 22.07. lagen nur 2 Sekunden auseinander (14:19 und 14:21).</li>
+          </ul>
+        </div>
+        <div class="vcol mixed">
+          <h3><span class="mark">→</span>Zu wenig Daten</h3>
+          <ul>
+            <li><strong>Nur zwei Einheiten:</strong> beide im Juli 2026, seitdem keine weitere. Für einen echten Trend braucht es mehr.</li>
+            <li><strong>Technik:</strong> du schwimmst Brust mit dem Kopf über Wasser. Mit Kopf im Wasser wird das Tempo vermutlich deutlich steigen.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <header><div class="eyebrow">Einheiten</div><h2>Alle Schwimmeinheiten</h2></header>
+      <div class="tablewrap"><table id="swimTable"></table></div>
+    </section>
+  </div>
 
   <footer>Daten aus Strava, abgerufen am 02.10.2026. Tempo auf Basis der Bewegungszeit.</footer>
 </div>
@@ -245,24 +407,53 @@ const RAW=[["2023-12-09T18:14","Workout","Abendtraining",0,8885,0,null],["2023-1
   const median = (arr) => { const s = [...arr].sort((a, b) => a - b); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
   const typeLabel = { Run: "Lauf", Ride: "Rad", Swim: "Schwimmen", InlineSkate: "Inliner", Workout: "Workout" };
 
-  $("countAll").textContent = acts.length;
-  $("countAll2").textContent = acts.length;
-
   const runs = acts.filter(a => a.type === "Run" && a.dist > 0);
-  const rides = acts.filter(a => a.type === "Ride" && a.dist >= 10000);
+  const allRides = acts.filter(a => a.type === "Ride");
+  const rides = allRides.filter(a => a.dist >= 10000);
+  const swims = acts.filter(a => a.type === "Swim");
   const home = runs.filter(a => a.dist >= 4700 && a.dist <= 5500 && a.elev >= 55 && a.elev <= 80);
   const byYear = (arr, y) => arr.filter(a => a.year === y);
   const sum = (arr, f) => arr.reduce((t, a) => t + f(a), 0);
-
-  // Tiles
   const best = (arr) => Math.min(...arr.map(pace));
-  const tiles = [
-    { label: "Bestzeit Hausrunde 2026", value: fmtPace(best(byYear(home, 2026))), unit: "/km", delta: "2025: " + fmtPace(best(byYear(home, 2025))) + " /km" },
-    { label: "Laufkilometer 2026", value: fmtNum(sum(byYear(runs, 2026), a => a.dist) / 1000), unit: "km", delta: "2025: " + fmtNum(sum(byYear(runs, 2025), a => a.dist) / 1000) + " km" },
-    { label: "Längste Radfahrt", value: fmtNum(Math.max(...byYear(rides, 2026).map(a => a.dist)) / 1000), unit: "km", delta: "2025: " + fmtNum(Math.max(...byYear(rides, 2025).map(a => a.dist)) / 1000) + " km" },
-    { label: "Längster Lauf", value: fmtNum(Math.max(...byYear(runs, 2026).map(a => a.dist)) / 1000, 1), unit: "km", delta: "2025: " + fmtNum(Math.max(...byYear(runs, 2025).map(a => a.dist)) / 1000, 1) + " km" }
-  ];
-  $("tiles").innerHTML = tiles.map(t => `<div class="tile"><span class="label">${t.label}</span><span class="value num">${t.value}<small>${t.unit}</small></span><span class="delta">${t.delta}</span></div>`).join("");
+  const maxDist = (arr) => Math.max(...arr.map(a => a.dist)) / 1000;
+
+  $("countAll").textContent = acts.length;
+  $("countAll2").textContent = acts.length;
+  $("cRun").textContent = runs.length; $("cRun2").textContent = runs.length;
+  $("cRide").textContent = allRides.length; $("cRide2").textContent = allRides.length;
+  $("cSwim").textContent = swims.length;
+
+  // ---------- Tiles ----------
+  function tiles(id, list) {
+    $(id).innerHTML = list.map(t => `<div class="tile"><span class="label">${t.label}</span><span class="value num">${t.value}<small>${t.unit}</small></span><span class="delta${t.flat ? " flat" : ""}">${t.delta}</span></div>`).join("");
+  }
+  const runKm = (y) => sum(byYear(runs, y), a => a.dist) / 1000;
+  const rideKm = (y) => sum(byYear(allRides, y), a => a.dist) / 1000;
+  tiles("tilesAll", [
+    { label: "Aktivitäten 2026", value: byYear(acts, 2026).length, unit: "", delta: "2025: " + byYear(acts, 2025).length },
+    { label: "Bewegungszeit 2026", value: fmtNum(sum(byYear(acts, 2026), a => a.moving) / 3600), unit: "h", delta: "2025: " + fmtNum(sum(byYear(acts, 2025), a => a.moving) / 3600) + " h" },
+    { label: "Bestwert Hausrunde", value: fmtPace(best(byYear(home, 2026))), unit: "/km", delta: "2025: " + fmtPace(best(byYear(home, 2025))) + " /km" },
+    { label: "Längste Radfahrt", value: fmtNum(maxDist(byYear(rides, 2026))), unit: "km", delta: "2025: " + fmtNum(maxDist(byYear(rides, 2025))) + " km" }
+  ]);
+  tiles("tilesRun", [
+    { label: "Bestwert Hausrunde 2026", value: fmtPace(best(byYear(home, 2026))), unit: "/km", delta: "2025: " + fmtPace(best(byYear(home, 2025))) + " /km" },
+    { label: "Laufkilometer 2026", value: fmtNum(runKm(2026)), unit: "km", delta: "2025: " + fmtNum(runKm(2025)) + " km" },
+    { label: "Läufe 2026", value: byYear(runs, 2026).length, unit: "", delta: "2025: " + byYear(runs, 2025).length },
+    { label: "Längster Lauf", value: fmtNum(maxDist(byYear(runs, 2026)), 1), unit: "km", delta: "2025: " + fmtNum(maxDist(byYear(runs, 2025)), 1) + " km" }
+  ]);
+  const longMed = (y) => median(byYear(rides, y).filter(a => a.dist >= 100000).map(kmh));
+  tiles("tilesRide", [
+    { label: "Längste Fahrt 2026", value: fmtNum(maxDist(byYear(rides, 2026))), unit: "km", delta: "2025: " + fmtNum(maxDist(byYear(rides, 2025))) + " km" },
+    { label: "Radkilometer 2026", value: fmtNum(rideKm(2026)), unit: "km", delta: "2025: " + fmtNum(rideKm(2025)) + " km" },
+    { label: "Tempo über 100 km", value: fmtNum(longMed(2026), 1), unit: "km/h", delta: "2025: " + fmtNum(longMed(2025), 1) + " km/h" },
+    { label: "Fahrten Jul bis Sep 2026", value: allRides.filter(a => a.year === 2026 && a.ym >= "2026-07").length, unit: "", delta: "2025: " + allRides.filter(a => a.year === 2025 && a.ym >= "2025-07" && a.ym <= "2025-09").length, flat: true }
+  ]);
+  const swimPace = (a) => a.moving / (a.dist / 100);
+  tiles("tilesSwim", [
+    { label: "Einheiten", value: swims.length, unit: "", delta: "seit 22.07.2026", flat: true },
+    { label: "Geschwommen", value: fmtNum(sum(swims, a => a.dist)), unit: "m", delta: "in " + fmtNum(sum(swims, a => a.moving) / 60) + " min", flat: true },
+    { label: "Bestes Tempo", value: fmtPace(Math.min(...swims.map(swimPace))), unit: "/100 m", delta: "Start: " + fmtPace(swimPace(swims[0])) + " /100 m" }
+  ]);
 
   // ---------- chart helpers ----------
   function el(name, attrs, parent) { const e = document.createElementNS(NS, name); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
@@ -277,59 +468,72 @@ const RAW=[["2023-12-09T18:14","Workout","Abendtraining",0,8885,0,null],["2023-1
   }
   const widthOf = (c) => Math.max(280, Math.round(c.clientWidth - 30));
   const T0 = new Date("2023-12-01").getTime(), T1 = new Date("2026-10-15").getTime();
-  function timeAxis(g, x, h, W) {
+  function timeAxis(g, x, h) {
     for (let y = 2024; y <= 2026; y++) {
-      const t = new Date(y + "-01-01").getTime(); const px = x(t);
+      const px = x(new Date(y + "-01-01").getTime());
       el("line", { x1: px, x2: px, y1: 0, y2: h, stroke: "var(--grid)", "stroke-width": 1 }, g);
-      const tx = el("text", { x: px + 4, y: h + 16 }, g); tx.textContent = y;
+      el("text", { x: px + 4, y: h + 16 }, g).textContent = y;
     }
   }
+  const MONTHS = []; for (let d = new Date(2023, 11, 1); d <= new Date(2026, 8, 1); d.setMonth(d.getMonth() + 1)) MONTHS.push(d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"));
+  const monthName = (ym) => { const [yy, mm] = ym.split("-"); return new Date(+yy, +mm - 1, 1).toLocaleDateString("de-DE", { month: "long", year: "numeric" }); };
+  const niceStep = (max) => { const raw = max / 4; const p = Math.pow(10, Math.floor(Math.log10(raw))); return [1, 2, 2.5, 5, 10].map(s => s * p).find(s => s >= raw); };
 
-  // ---------- Volume chart ----------
-  function drawVolume() {
-    const c = $("volChart"); c.querySelectorAll("svg,.tip").forEach(n => n.remove());
-    const W = widthOf(c), H = 240, m = { l: 34, r: 8, t: 10, b: 26 };
-    const months = []; for (let d = new Date(2023, 11, 1); d <= new Date(2026, 8, 1); d.setMonth(d.getMonth() + 1)) months.push(d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"));
-    const data = months.map(ym => {
-      const inM = acts.filter(a => a.ym === ym && a.type !== "Workout");
-      return { ym, run: sum(inM.filter(a => a.type === "Run"), a => a.moving) / 3600, ride: sum(inM.filter(a => a.type === "Ride"), a => a.moving) / 3600, other: sum(inM.filter(a => a.type !== "Run" && a.type !== "Ride"), a => a.moving) / 3600, n: inM.length };
-    });
-    const maxV = Math.ceil(Math.max(...data.map(d => d.run + d.ride + d.other)) / 10) * 10;
-    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Bewegungszeit pro Monat" }); c.appendChild(svg);
+  // Stacked monthly bars. series: [{key, color, label, value(acts)->number}]
+  function drawMonthly(id, series, unit, digits, annotate) {
+    const c = $(id); c.querySelectorAll("svg,.tip").forEach(n => n.remove());
+    const W = widthOf(c), H = 230, m = { l: 46, r: 8, t: 12, b: 26 };
+    const data = MONTHS.map(ym => { const inM = acts.filter(a => a.ym === ym); const d = { ym }; series.forEach(s => d[s.key] = s.value(inM)); d.total = series.reduce((t, s) => t + d[s.key], 0); return d; });
+    const step = niceStep(Math.max(...data.map(d => d.total)));
+    const maxV = Math.ceil(Math.max(...data.map(d => d.total)) / step) * step;
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": c.dataset.label || "Monatswerte" }); c.appendChild(svg);
     const g = el("g", { transform: `translate(${m.l},${m.t})` }, svg);
     const iw = W - m.l - m.r, ih = H - m.t - m.b;
     const y = (v) => ih - v / maxV * ih;
-    for (let v = 0; v <= maxV; v += 10) { el("line", { x1: 0, x2: iw, y1: y(v), y2: y(v), stroke: v ? "var(--grid)" : "var(--axis)" }, g); const t = el("text", { x: -6, y: y(v) + 4, "text-anchor": "end" }, g); t.textContent = v + " h"; }
-    const bw = iw / months.length; const barW = Math.max(3, bw - 3);
+    for (let v = 0; v <= maxV + 1e-9; v += step) { el("line", { x1: 0, x2: iw, y1: y(v), y2: y(v), stroke: v ? "var(--grid)" : "var(--axis)" }, g); el("text", { x: -6, y: y(v) + 4, "text-anchor": "end" }, g).textContent = fmtNum(v) + " " + unit; }
+    const bw = iw / MONTHS.length; const barW = Math.max(3, bw - 3);
     const tip = makeTip(c);
     data.forEach((d, i) => {
       const x0 = i * bw + (bw - barW) / 2; let base = 0;
-      const segs = [["run", "var(--run)"], ["ride", "var(--ride)"], ["other", "var(--other)"]].filter(([k]) => d[k] > 0);
-      segs.forEach(([k, col], si) => {
-        const h = d[k] / maxV * ih; const top = si === segs.length - 1;
-        const yTop = y(base + d[k]); const gap = si > 0 ? 1 : 0;
+      const segs = series.filter(s => d[s.key] > 0);
+      segs.forEach((s, si) => {
+        const h = d[s.key] / maxV * ih; const top = si === segs.length - 1;
+        const yTop = y(base + d[s.key]); const gap = si > 0 ? 1 : 0;
         if (top && h > 4) {
           const r = Math.min(3, barW / 2);
-          el("path", { d: `M${x0},${y(base) - gap} V${yTop + r} Q${x0},${yTop} ${x0 + r},${yTop} H${x0 + barW - r} Q${x0 + barW},${yTop} ${x0 + barW},${yTop + r} V${y(base) - gap} Z`, fill: col }, g);
-        } else el("rect", { x: x0, y: yTop, width: barW, height: Math.max(0, h - gap), fill: col }, g);
-        base += d[k];
+          el("path", { d: `M${x0},${y(base) - gap} V${yTop + r} Q${x0},${yTop} ${x0 + r},${yTop} H${x0 + barW - r} Q${x0 + barW},${yTop} ${x0 + barW},${yTop + r} V${y(base) - gap} Z`, fill: s.color }, g);
+        } else el("rect", { x: x0, y: yTop, width: barW, height: Math.max(0, h - gap), fill: s.color }, g);
+        base += d[s.key];
       });
-      if (d.ym.endsWith("-01") || i === 0) { const t = el("text", { x: x0 + barW / 2, y: ih + 16, "text-anchor": "middle" }, g); t.textContent = d.ym.endsWith("-01") ? d.ym.slice(0, 4) : "Dez"; }
+      if (d.ym.endsWith("-01") || i === 0) el("text", { x: x0 + barW / 2, y: ih + 16, "text-anchor": "middle" }, g).textContent = d.ym.endsWith("-01") ? d.ym.slice(0, 4) : "Dez";
       const hit = el("rect", { x: i * bw, y: 0, width: bw, height: ih, fill: "transparent" }, g);
-      const [yy, mm] = d.ym.split("-");
-      const label = new Date(+yy, +mm - 1, 1).toLocaleDateString("de-DE", { month: "long", year: "numeric" });
-      hit.addEventListener("mouseenter", () => showTip(tip, c, svg, m.l + x0 + barW / 2, m.t + y(d.run + d.ride + d.other), `<b>${label}</b><br><span class="t-sub">Laufen ${fmtNum(d.run, 1)} h · Rad ${fmtNum(d.ride, 1)} h${d.other ? " · Sonst. " + fmtNum(d.other, 1) + " h" : ""}</span>`));
+      const detail = series.length > 1 ? series.filter(s => d[s.key] > 0).map(s => s.label + " " + fmtNum(d[s.key], digits) + " " + unit).join(" · ") || "keine Aktivität" : fmtNum(d.total, digits) + " " + unit;
+      hit.addEventListener("mouseenter", () => showTip(tip, c, svg, m.l + x0 + barW / 2, m.t + y(d.total), `<b>${monthName(d.ym)}</b><br><span class="t-sub">${detail}</span>`));
       hit.addEventListener("mouseleave", () => tip.hidden = true);
     });
-    // annotate peak
-    const pk = data.reduce((a, b) => (a.run + a.ride + a.other) >= (b.run + b.ride + b.other) ? a : b);
-    const pi = data.indexOf(pk);
-    const at = el("text", { x: pi * bw - 6, y: y(pk.run + pk.ride + pk.other) + 12, "text-anchor": "end", class: "lbl" }, g);
-    at.textContent = W < 600 ? "Mai 2026" : "Mai 2026: Amsterdam-Tour";
-    // winter gap label
-    const gi = months.indexOf("2025-12");
-    const wt = el("text", { x: gi * bw, y: ih - 30, "text-anchor": "middle", class: "lbl" }, g); wt.textContent = "Winterpause";
+    if (annotate) annotate({ g, data, y, bw, W, ih });
   }
+
+  function drawVolume() {
+    drawMonthly("volChart", [
+      { key: "run", color: "var(--run)", label: "Laufen", value: (a) => sum(a.filter(q => q.type === "Run"), q => q.moving) / 3600 },
+      { key: "ride", color: "var(--ride)", label: "Rad", value: (a) => sum(a.filter(q => q.type === "Ride"), q => q.moving) / 3600 },
+      { key: "swim", color: "var(--swim)", label: "Schwimmen", value: (a) => sum(a.filter(q => q.type === "Swim"), q => q.moving) / 3600 },
+      { key: "other", color: "var(--other)", label: "Inliner", value: (a) => sum(a.filter(q => q.type === "InlineSkate"), q => q.moving) / 3600 }
+    ], "h", 1, ({ g, data, y, bw, W, ih }) => {
+      const pk = data.reduce((a, b) => a.total >= b.total ? a : b); const pi = data.indexOf(pk);
+      el("text", { x: pi * bw - 6, y: y(pk.total) + 12, "text-anchor": "end", class: "lbl" }, g).textContent = W < 600 ? "Mai 2026" : "Mai 2026: Amsterdam-Tour";
+      el("text", { x: MONTHS.indexOf("2025-12") * bw, y: ih - 30, "text-anchor": "middle", class: "lbl" }, g).textContent = "Winterpause";
+    });
+  }
+  const drawRunVol = () => drawMonthly("runVol", [{ key: "km", color: "var(--run)", label: "Laufen", value: (a) => sum(a.filter(q => q.type === "Run"), q => q.dist) / 1000 }], "km", 1, ({ g, data, y, bw }) => {
+    const pk = data.reduce((a, b) => a.total >= b.total ? a : b); const pi = data.indexOf(pk);
+    el("text", { x: pi * bw - 6, y: y(pk.total) + 12, "text-anchor": "end", class: "lbl" }, g).textContent = "Halbmarathon";
+  });
+  const drawRideVol = () => drawMonthly("rideVol", [{ key: "km", color: "var(--ride)", label: "Rad", value: (a) => sum(a.filter(q => q.type === "Ride"), q => q.dist) / 1000 }], "km", 0, ({ g, data, y, bw }) => {
+    const lbl = (ym, txt) => { const i = MONTHS.indexOf(ym); el("text", { x: i * bw - 6, y: y(data[i].total) + 12, "text-anchor": "end", class: "lbl" }, g).textContent = txt; };
+    lbl("2025-07", "Prag"); lbl("2026-05", "Amsterdam");
+  });
 
   // ---------- Pace chart ----------
   function drawPace() {
@@ -341,11 +545,10 @@ const RAW=[["2023-12-09T18:14","Workout","Abendtraining",0,8885,0,null],["2023-1
     const pMin = 285, pMax = 570; // 4:45 .. 9:30, faster = higher
     const x = (t) => (t - T0) / (T1 - T0) * iw;
     const y = (p) => (p - pMin) / (pMax - pMin) * ih;
-    for (let p = 300; p <= 570; p += 30) { el("line", { x1: 0, x2: iw, y1: y(p), y2: y(p), stroke: "var(--grid)" }, g); const t = el("text", { x: -6, y: y(p) + 4, "text-anchor": "end" }, g); t.textContent = fmtPace(p); }
+    for (let p = 300; p <= 570; p += 30) { el("line", { x1: 0, x2: iw, y1: y(p), y2: y(p), stroke: "var(--grid)" }, g); el("text", { x: -6, y: y(p) + 4, "text-anchor": "end" }, g).textContent = fmtPace(p); }
     el("line", { x1: 0, x2: iw, y1: ih, y2: ih, stroke: "var(--axis)" }, g);
-    timeAxis(g, x, ih, iw);
+    timeAxis(g, x, ih);
     const pts = home.slice().sort((a, b) => a.date - b.date);
-    // rolling median
     const roll = pts.map((a, i) => ({ t: a.date.getTime(), p: median(pts.slice(Math.max(0, i - 4), i + 1).map(pace)) }));
     const rollPath = roll.filter((r, i) => i >= 2).map((r, i) => (i ? "L" : "M") + x(r.t).toFixed(1) + "," + y(r.p).toFixed(1)).join(" ");
     el("path", { d: rollPath, fill: "none", stroke: "var(--ink-2)", "stroke-width": 2, "stroke-linejoin": "round" }, g);
@@ -358,10 +561,9 @@ const RAW=[["2023-12-09T18:14","Workout","Abendtraining",0,8885,0,null],["2023-1
       hit.addEventListener("mouseenter", () => showTip(tip, c, svg, m.l + cx, m.t + cy, `<b>${a.name}</b><br><span class="t-sub">${fmtDate(a.date)} · ${fmtNum(a.dist / 1000, 2)} km · ${fmtPace(pace(a))} /km</span>`));
       hit.addEventListener("mouseleave", () => tip.hidden = true);
     });
-    // annotations
     const b25 = pts.filter(a => a.year === 2025).reduce((a, b) => pace(a) < pace(b) ? a : b);
     const lastBest = pts.filter(a => pace(a) - bestP < 1).pop();
-    const ann = (a, txt, anchor, dy) => { const t = el("text", { x: x(a.date.getTime()) + (anchor === "end" ? -10 : 10), y: y(pace(a)) + dy, "text-anchor": anchor, class: "lbl-strong" }, g); t.textContent = txt; };
+    const ann = (a, txt, anchor, dy) => { el("text", { x: x(a.date.getTime()) + (anchor === "end" ? -10 : 10), y: y(pace(a)) + dy, "text-anchor": anchor, class: "lbl-strong" }, g).textContent = txt; };
     ann(b25, "Bestwert 2025: " + fmtPace(pace(b25)), "start", -10);
     ann(lastBest, "Bestwert: " + fmtPace(pace(lastBest)) + " /km", "end", 4);
   }
@@ -376,13 +578,12 @@ const RAW=[["2023-12-09T18:14","Workout","Abendtraining",0,8885,0,null],["2023-1
     const vMin = 10, vMax = 35;
     const x = (t) => (t - T0) / (T1 - T0) * iw;
     const y = (v) => ih - (v - vMin) / (vMax - vMin) * ih;
-    for (let v = 10; v <= 35; v += 5) { el("line", { x1: 0, x2: iw, y1: y(v), y2: y(v), stroke: v === 10 ? "var(--axis)" : "var(--grid)" }, g); const t = el("text", { x: -6, y: y(v) + 4, "text-anchor": "end" }, g); t.textContent = v + " km/h"; }
-    timeAxis(g, x, ih, iw);
+    for (let v = 10; v <= 35; v += 5) { el("line", { x1: 0, x2: iw, y1: y(v), y2: y(v), stroke: v === 10 ? "var(--axis)" : "var(--grid)" }, g); el("text", { x: -6, y: y(v) + 4, "text-anchor": "end" }, g).textContent = v + " km/h"; }
+    timeAxis(g, x, ih);
     const r = (d) => 3.5 + Math.sqrt(d / 1000) * 0.9;
     const tip = makeTip(c);
     rides.slice().sort((a, b) => b.dist - a.dist).forEach(a => {
-      const cx = x(a.date.getTime()), cy = y(kmh(a));
-      el("circle", { cx, cy, r: r(a.dist), fill: "var(--ride)", "fill-opacity": 0.78, stroke: "var(--surface)", "stroke-width": 2 }, g);
+      el("circle", { cx: x(a.date.getTime()), cy: y(kmh(a)), r: r(a.dist), fill: "var(--ride)", "fill-opacity": 0.78, stroke: "var(--surface)", "stroke-width": 2 }, g);
     });
     rides.forEach(a => {
       const cx = x(a.date.getTime()), cy = y(kmh(a));
@@ -390,37 +591,51 @@ const RAW=[["2023-12-09T18:14","Workout","Abendtraining",0,8885,0,null],["2023-1
       hit.addEventListener("mouseenter", () => showTip(tip, c, svg, m.l + cx, m.t + cy - r(a.dist) + 6, `<b>${a.name}</b><br><span class="t-sub">${fmtDate(a.date)} · ${fmtNum(a.dist / 1000, 1)} km · ${fmtNum(kmh(a), 1)} km/h · ${fmtNum(a.elev)} hm</span>`));
       hit.addEventListener("mouseleave", () => tip.hidden = true);
     });
-    const lab = (name, txt, anchor, dx, dy) => { const a = rides.find(q => q.name === name); const t = el("text", { x: x(a.date.getTime()) + dx, y: y(kmh(a)) + dy, "text-anchor": anchor, class: "lbl-strong" }, g); t.textContent = txt; };
+    const lab = (name, txt, anchor, dx, dy) => { const a = rides.find(q => q.name === name); el("text", { x: x(a.date.getTime()) + dx, y: y(kmh(a)) + dy, "text-anchor": anchor, class: "lbl-strong" }, g).textContent = txt; };
     lab("All In", "All In · 32,6 km/h", "end", -10, 4);
     lab("Amsterdam Tag 3", "Amsterdam Tag 3 · 265 km", "end", -26, 4);
     lab("Bikepacking Prag Tag 1", "Prag Tag 1 · 189 km", "start", 4, 34);
   }
 
-  // ---------- Year table ----------
-  (function yearTable() {
+  // ---------- Swim bars ----------
+  (function swimBars() {
+    // Serien aus den Notizen der Einheit vom 22.07.2026, dazu die Einheit vom 25.07.2026
+    const sets = [
+      { name: "Serie 1: 10 × 50 m", sub: "22.07.2026", m: 500, s: 14 * 60 + 19 },
+      { name: "Serie 2: 10 × 50 m", sub: "22.07.2026", m: 500, s: 14 * 60 + 21 },
+      { name: "Serie 3: 5 × 50 m", sub: "22.07.2026", m: 250, s: 8 * 60 + 20 },
+      { name: "Abendschwimmen: 10 × 50 m", sub: "25.07.2026", m: swims[1].dist, s: swims[1].moving }
+    ].map(q => ({ ...q, p: q.s / (q.m / 100) }));
+    const maxP = 210, bestP = Math.min(...sets.map(q => q.p));
+    $("swimBars").innerHTML = sets.map(q => `<div class="hbar${q.p === bestP ? " best" : ""}"><span class="name">${q.name}<small>${q.sub}</small></span><span class="track"><span class="fill" style="display:block;width:${(q.p / maxP * 100).toFixed(1)}%"></span></span><span class="val">${fmtPace(q.p)} /100 m</span></div>`).join("");
+  })();
+
+  // ---------- Year tables ----------
+  function yearTable(id, rowsDef) {
     const years = [2024, 2025, 2026];
-    const rowsDef = [
-      ["group", "Laufen"],
-      ["Läufe", y => byYear(runs, y).length],
-      ["Kilometer", y => fmtNum(sum(byYear(runs, y), a => a.dist) / 1000, 1)],
-      ["Längster Lauf", y => fmtNum(Math.max(...byYear(runs, y).map(a => a.dist)) / 1000, 1) + " km"],
-      ["Median-Tempo aller Läufe", y => fmtPace(median(byYear(runs, y).map(pace))) + " /km", "min"],
-      ["Bestwert Hausrunde", y => byYear(home, y).length ? fmtPace(best(byYear(home, y))) + " /km" : "–", "min"],
-      ["group", "Rad (Fahrten ab 10 km)"],
-      ["Fahrten", y => byYear(rides, y).length],
-      ["Kilometer", y => fmtNum(sum(byYear(rides, y), a => a.dist) / 1000)],
-      ["Höhenmeter", y => fmtNum(sum(byYear(rides, y), a => a.elev))],
-      ["Längste Fahrt", y => fmtNum(Math.max(...byYear(rides, y).map(a => a.dist)) / 1000) + " km"],
-      ["Median-Tempo", y => fmtNum(median(byYear(rides, y).map(kmh)), 1) + " km/h"]
-    ];
     let html = `<thead><tr><th></th>${years.map(y => `<th>${y}</th>`).join("")}</tr></thead><tbody>`;
     rowsDef.forEach(([label, f]) => {
-      if (label === "group") { html += `<tr class="group"><td colspan="${years.length + 1}">${f}</td></tr>`; return; }
-      const vals = years.map(f);
-      html += `<tr><td>${label}</td>${vals.map((v, i) => `<td${i === 2 ? ' class="best"' : ""}>${v}</td>`).join("")}</tr>`;
+      html += `<tr><td>${label}</td>${years.map(f).map((v, i) => `<td${i === 2 ? ' class="best"' : ""}>${v}</td>`).join("")}</tr>`;
     });
-    $("yearTable").innerHTML = html + "</tbody>";
-  })();
+    $(id).innerHTML = html + "</tbody>";
+  }
+  const orDash = (arr, f) => arr.length ? f(arr) : "–";
+  yearTable("yearRun", [
+    ["Läufe", y => byYear(runs, y).length],
+    ["Kilometer", y => fmtNum(runKm(y), 1)],
+    ["Längster Lauf", y => orDash(byYear(runs, y), a => fmtNum(maxDist(a), 1) + " km")],
+    ["Median-Tempo aller Läufe", y => orDash(byYear(runs, y), a => fmtPace(median(a.map(pace))) + " /km")],
+    ["Median Hausrunde", y => orDash(byYear(home, y), a => fmtPace(median(a.map(pace))) + " /km")],
+    ["Bestwert Hausrunde", y => orDash(byYear(home, y), a => fmtPace(best(a)) + " /km")]
+  ]);
+  yearTable("yearRide", [
+    ["Fahrten", y => byYear(allRides, y).length],
+    ["Kilometer", y => fmtNum(rideKm(y))],
+    ["Höhenmeter", y => fmtNum(sum(byYear(allRides, y), a => a.elev))],
+    ["Längste Fahrt", y => orDash(byYear(rides, y), a => fmtNum(maxDist(a)) + " km")],
+    ["Median-Tempo (ab 10 km)", y => orDash(byYear(rides, y), a => fmtNum(median(a.map(kmh)), 1) + " km/h")],
+    ["Fahrten über 100 km", y => byYear(rides, y).filter(a => a.dist >= 100000).length]
+  ]);
 
   // ---------- Milestones ----------
   const miles = [
@@ -432,23 +647,49 @@ const RAW=[["2023-12-09T18:14","Workout","Abendtraining",0,8885,0,null],["2023-1
     ["2026-04-05", "run", "<strong>Erster Halbmarathon:</strong> 21,3 km bei Wind und Regen. Ziel war ankommen."],
     ["2026-05-30", "ride", "<strong>Amsterdam Tag 3:</strong> 265 km an einem Tag, insgesamt 607 km in drei Tagen."],
     ["2026-07-21", "run", "<strong>Rekordversuch:</strong> 5,25 km mit 5:01 /km und 12 Bestleistungen."],
-    ["2026-07-22", "other", "<strong>Erstes Schwimmtraining:</strong> 1.250 m Brust."],
+    ["2026-07-22", "swim", "<strong>Erstes Schwimmtraining:</strong> 1.250 m Brust."],
     ["2026-09-30", "run", "<strong>Neuer Bestwert:</strong> Hausrunde mit 5:00 /km, 13 Bestleistungen."]
   ];
   $("miles").innerHTML = miles.map(([d, k, t]) => `<li style="--c:var(--${k})"><span class="d">${fmtDate(new Date(d))}</span><span class="t">${t}</span></li>`).join("");
 
-  // ---------- All activities ----------
-  (function allTable() {
-    let html = `<thead><tr><th>Datum</th><th>Art</th><th>Name</th><th>Distanz</th><th>Zeit</th><th>Tempo</th><th>Höhe</th></tr></thead><tbody>`;
-    acts.slice().reverse().forEach(a => {
-      const tempo = a.type === "Run" && a.dist ? fmtPace(pace(a)) + " /km" : (a.type === "Ride" || a.type === "InlineSkate") && a.dist ? fmtNum(kmh(a), 1) + " km/h" : "–";
-      html += `<tr><td>${fmtDate(a.date)}</td><td>${typeLabel[a.type] || a.type}</td><td style="text-align:left">${a.name}</td><td>${a.dist ? fmtNum(a.dist / 1000, 1) + " km" : "–"}</td><td>${fmtDur(a.moving)}</td><td>${tempo}</td><td>${a.elev ? fmtNum(a.elev) + " m" : "–"}</td></tr>`;
+  // ---------- Activity tables ----------
+  const esc = (s) => s.replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+  function activityTable(id, list, tempoFn, showType) {
+    let html = `<thead><tr><th>Datum</th>${showType ? "<th>Art</th>" : ""}<th>Name</th><th>Distanz</th><th>Zeit</th><th>Tempo</th><th>Höhe</th></tr></thead><tbody>`;
+    list.slice().reverse().forEach(a => {
+      const dist = !a.dist ? "–" : a.type === "Swim" ? fmtNum(a.dist) + " m" : fmtNum(a.dist / 1000, 1) + " km";
+      html += `<tr><td>${fmtDate(a.date)}</td>${showType ? `<td>${typeLabel[a.type] || a.type}</td>` : ""}<td style="text-align:left">${esc(a.name)}</td><td>${dist}</td><td>${fmtDur(a.moving)}</td><td>${tempoFn(a)}</td><td>${a.elev ? fmtNum(a.elev) + " m" : "–"}</td></tr>`;
     });
-    $("allTable").innerHTML = html + "</tbody>";
-  })();
+    $(id).innerHTML = html + "</tbody>";
+  }
+  const anyTempo = (a) => !a.dist ? "–" : a.type === "Run" ? fmtPace(pace(a)) + " /km" : a.type === "Swim" ? fmtPace(swimPace(a)) + " /100 m" : fmtNum(kmh(a), 1) + " km/h";
+  activityTable("allTable", acts, anyTempo, true);
+  activityTable("runTable", runs, anyTempo, false);
+  activityTable("rideTable", allRides, anyTempo, false);
+  activityTable("swimTable", swims, anyTempo, false);
 
-  function drawAll() { drawVolume(); drawPace(); drawRides(); }
-  drawAll();
-  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawAll, 150); });
+  // ---------- Tabs ----------
+  const draws = { gesamt: [drawVolume], laufen: [drawPace, drawRunVol], radfahren: [drawRides, drawRideVol], schwimmen: [] };
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  let current = "gesamt";
+  function select(id, focus) {
+    if (!draws[id]) id = "gesamt";
+    current = id;
+    tabs.forEach(t => { const on = t.getAttribute("aria-controls") === id; t.setAttribute("aria-selected", on); t.tabIndex = on ? 0 : -1; if (on && focus) t.focus(); });
+    document.querySelectorAll('[role="tabpanel"]').forEach(p => p.hidden = p.id !== id);
+    draws[id].forEach(f => f());
+    try { localStorage.setItem("strava-tab", id); } catch (e) {}
+  }
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => select(t.getAttribute("aria-controls")));
+    t.addEventListener("keydown", (e) => {
+      const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if (d) { e.preventDefault(); select(tabs[(i + d + tabs.length) % tabs.length].getAttribute("aria-controls"), true); }
+    });
+  });
+  let start = location.hash.slice(1);
+  if (!draws[start]) { try { start = localStorage.getItem("strava-tab") || "gesamt"; } catch (e) { start = "gesamt"; } }
+  select(start);
+  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => draws[current].forEach(f => f()), 150); });
 })();
 </script>

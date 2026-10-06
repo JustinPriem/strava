@@ -1,0 +1,597 @@
+<title>Bad Berka → Amsterdam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: eine Etappenkarte. Oben die Route als Karte mit Replay, darunter Höhen-/Tempo-/Pulsprofil über alle 607 km, dann die drei Etappen und was die Daten zeigen. */
+:root {
+  --bg: #f6f7f4;
+  --surface: #fcfcfb;
+  --ink: #12160f;
+  --ink-2: #4b5147;
+  --muted: #7d8278;
+  --grid: #e1e3dc;
+  --axis: #c3c6bb;
+  --ring: rgba(18,22,15,0.10);
+  --d1: #d4561f;
+  --d2: #b98500;
+  --d3: #2a6fd0;
+  --night: rgba(40,48,110,0.09);
+  --night-ink: #3d4797;
+  --dot: #ffffff;
+  --font-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f110e; --surface: #181a17; --ink: #f4f5f1; --ink-2: #c3c6bb; --muted: #8b8f84;
+    --grid: #262924; --axis: #3a3d36; --ring: rgba(255,255,255,0.10);
+    --d1: #f07a42; --d2: #e2b23a; --d3: #5b9bf0;
+    --night: rgba(120,135,255,0.10); --night-ink: #a3adff; --dot: #0f110e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f110e; --surface: #181a17; --ink: #f4f5f1; --ink-2: #c3c6bb; --muted: #8b8f84;
+  --grid: #262924; --axis: #3a3d36; --ring: rgba(255,255,255,0.10);
+  --d1: #f07a42; --d2: #e2b23a; --d3: #5b9bf0;
+  --night: rgba(120,135,255,0.10); --night-ink: #a3adff; --dot: #0f110e;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+.page { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: flex; flex-direction: column; gap: 56px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: 0.005em; }
+h2 { font-size: 30px; font-weight: 700; text-transform: uppercase; line-height: 1; }
+p { margin: 0; max-width: 66ch; }
+.eyebrow { font-family: var(--font-data); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+section { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+/* Kopf */
+.hero { display: flex; flex-direction: column; gap: 14px; }
+.hero h1 { font-size: clamp(46px, 9vw, 104px); line-height: 0.9; font-weight: 800; text-transform: uppercase; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.22em; }
+.hero h1 .arrow { color: var(--d1); font-weight: 500; }
+.hero .lede { font-size: 17px; color: var(--ink-2); }
+.tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1px; background: var(--grid); border: 1px solid var(--grid); border-radius: 10px; overflow: hidden; margin-top: 10px; }
+.tile { background: var(--surface); padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tile b { font-family: var(--font-display); font-size: 34px; font-weight: 700; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.tile b small { font-size: 18px; font-weight: 500; color: var(--ink-2); margin-left: 3px; }
+.tile span { font-size: 13px; color: var(--muted); }
+@media (max-width: 760px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tile:last-child { grid-column: span 2; } }
+
+/* Karte + Replay */
+.stage { background: var(--surface); border: 1px solid var(--grid); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+.map-wrap { position: relative; }
+#map { display: block; width: 100%; touch-action: pan-y; cursor: crosshair; }
+.legend { position: absolute; left: 14px; bottom: 10px; display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); pointer-events: none; }
+.legend i { display: inline-block; width: 16px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 12px; padding: 5px 8px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, calc(-100% - 12px)); font-family: var(--font-data); }
+.hud { display: grid; grid-template-columns: auto repeat(6, minmax(0, 1fr)); align-items: stretch; border-top: 1px solid var(--grid); }
+.hud .ctrl { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-right: 1px solid var(--grid); }
+.hud .ro { padding: 10px 14px; border-right: 1px solid var(--grid); display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+.hud .ro:last-child { border-right: 0; }
+.hud .ro span { font-size: 11px; font-family: var(--font-data); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.hud .ro b { font-family: var(--font-display); font-size: 24px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hud .ro b small { font-size: 14px; font-weight: 500; color: var(--ink-2); margin-left: 2px; }
+.hud .ro span .chip { font-size: 10px; padding: 0 6px; letter-spacing: 0; }
+.chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-family: var(--font-data); padding: 1px 8px; border-radius: 99px; background: var(--grid); color: var(--ink-2); vertical-align: middle; }
+.chip.night { background: var(--night); color: var(--night-ink); }
+button { font: inherit; color: inherit; }
+.play { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--ink); color: var(--bg); display: grid; place-items: center; cursor: pointer; flex: none; }
+.play svg { width: 18px; height: 18px; fill: currentColor; }
+.btn { border: 1px solid var(--axis); background: transparent; border-radius: 8px; padding: 6px 10px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--ink-2); }
+select.btn { appearance: none; padding-right: 10px; background: var(--surface); }
+:focus-visible { outline: 2px solid var(--d3); outline-offset: 2px; }
+.toast { position: absolute; top: 14px; right: 14px; background: var(--ink); color: var(--bg); padding: 8px 12px; border-radius: 8px; font-size: 13px; font-family: var(--font-data); transition: opacity .25s; }
+@media (max-width: 860px) {
+  .hud { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hud .ctrl { grid-column: 1 / -1; border-right: 0; border-bottom: 1px solid var(--grid); }
+  .hud .ro { border-bottom: 1px solid var(--grid); }
+  .hud .ro:nth-child(4), .hud .ro:nth-child(7) { border-right: 0; }
+  .legend { position: static; padding: 0 14px 10px; }
+}
+
+/* Profil */
+.profile-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+.seg { display: inline-flex; border: 1px solid var(--axis); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 6px 14px; font-size: 13px; cursor: pointer; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+#profile { display: block; width: 100%; height: 240px; cursor: crosshair; touch-action: pan-y; }
+.note { font-size: 13px; color: var(--muted); }
+.note i { display: inline-block; width: 12px; height: 12px; background: var(--night); border: 1px solid var(--night-ink); vertical-align: -1px; margin-right: 5px; border-radius: 2px; }
+
+/* Etappen */
+.days { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .days { grid-template-columns: 1fr; } }
+.day { background: var(--surface); border: 1px solid var(--grid); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; border-top: 4px solid var(--c); }
+.day header { display: flex; flex-direction: column; gap: 2px; }
+.day h3 { font-size: 28px; font-weight: 700; text-transform: uppercase; line-height: 1; }
+.day .route { color: var(--ink-2); font-size: 14px; }
+.day dl { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; margin: 0; font-size: 14px; }
+.day dt { color: var(--muted); }
+.day dd { margin: 0; text-align: right; font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.day .btn { align-self: flex-start; }
+
+/* Erkenntnisse */
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+@media (max-width: 860px) { .facts { grid-template-columns: 1fr; } }
+.fact { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.fact b { font-family: var(--font-display); font-size: 44px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.fact h3 { font-size: 20px; font-weight: 700; text-transform: uppercase; }
+.fact p { color: var(--ink-2); font-size: 14.5px; }
+.fact svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+.convert { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .convert { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.conv { border-top: 1px solid var(--axis); padding-top: 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.conv b { font-family: var(--font-display); font-size: 36px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.conv span { font-size: 13.5px; color: var(--ink-2); }
+
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 520px; }
+th { text-align: left; font-weight: 500; color: var(--muted); font-size: 12px; font-family: var(--font-data); letter-spacing: .05em; text-transform: uppercase; padding: 8px 10px; border-bottom: 1px solid var(--axis); }
+td { padding: 8px 10px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+td.r, th.r { text-align: right; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td { background: var(--grid); }
+.bar { height: 8px; border-radius: 4px; background: var(--c); min-width: 2px; }
+.sw { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c); margin-right: 8px; }
+footer { font-size: 13px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+
+<div class="page">
+  <header class="hero">
+    <div class="eyebrow">Radtour · 28.–31. Mai 2026 · drei Etappen</div>
+    <h1><span>Bad Berka</span><span class="arrow">→</span><span>Amsterdam</span></h1>
+    <p class="lede" id="lede"></p>
+    <div class="tiles" id="tiles"></div>
+  </header>
+
+  <section aria-labelledby="h-map">
+    <h2 id="h-map">Die Route</h2>
+    <div class="stage">
+      <div class="map-wrap">
+        <canvas id="map" aria-label="Karte der Route von Bad Berka nach Amsterdam"></canvas>
+        <div class="tip" id="tip" hidden></div>
+        <div class="toast" id="toast" hidden></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="hud">
+        <div class="ctrl">
+          <button class="play" id="play" aria-label="Replay starten"><svg viewBox="0 0 24 24" id="playIcon"><path d="M7 4v16l13-8z"/></svg></button>
+          <select class="btn" id="speed" aria-label="Replay-Geschwindigkeit">
+            <option value="120">2 Minuten</option>
+            <option value="60" selected>1 Minute</option>
+            <option value="20">20 Sekunden</option>
+          </select>
+          <button class="btn" id="restart">Von vorn</button>
+        </div>
+        <div class="ro"><span>Etappe</span><b id="r-day">–</b></div>
+        <div class="ro"><span>Strecke</span><b id="r-km">–</b></div>
+        <div class="ro"><span id="r-clock-l">Uhrzeit</span><b id="r-clock">–</b></div>
+        <div class="ro"><span>Tempo</span><b id="r-v">–</b></div>
+        <div class="ro"><span>Puls</span><b id="r-hr">–</b></div>
+        <div class="ro"><span>Höhe</span><b id="r-alt">–</b></div>
+      </div>
+    </div>
+    <p class="note">Mit der Maus oder dem Finger über Karte oder Profil fahren, um jeden Punkt der Strecke anzusehen. Kreise auf der Karte sind Pausen ab 5 Minuten, je größer, desto länger.</p>
+  </section>
+
+  <section aria-labelledby="h-prof">
+    <div class="profile-head">
+      <h2 id="h-prof">Profil über 607 km</h2>
+      <div class="seg" role="group" aria-label="Messgröße">
+        <button aria-pressed="true" data-m="alt">Höhe</button>
+        <button aria-pressed="false" data-m="v">Tempo</button>
+        <button aria-pressed="false" data-m="hr">Puls</button>
+      </div>
+    </div>
+    <canvas id="profile" aria-label="Profil der gesamten Tour"></canvas>
+    <p class="note"><i></i>Gefahren nach Sonnenuntergang. Striche unten markieren Pausen.</p>
+  </section>
+
+  <section aria-labelledby="h-days">
+    <h2 id="h-days">Die drei Etappen</h2>
+    <div class="days" id="days"></div>
+  </section>
+
+  <section aria-labelledby="h-facts">
+    <h2 id="h-facts">Was die Daten zeigen</h2>
+    <div class="facts" id="facts"></div>
+  </section>
+
+  <section aria-labelledby="h-conv">
+    <h2 id="h-conv">Umgerechnet</h2>
+    <div class="convert" id="convert"></div>
+  </section>
+
+  <section aria-labelledby="h-pause">
+    <h2 id="h-pause">Die längsten Pausen</h2>
+    <div class="table-wrap"><table id="pauses"></table></div>
+  </section>
+
+  <footer>Daten: Strava (Aktivitäten „Amsterdam Tag 1–3“), GPS-Streams mit 1.500 Messpunkten je Etappe. Sonnenuntergang berechnet für die Streckenmitte jeder Etappe. Grenzübergang aus dem GPS-Verlauf geschätzt.</footer>
+</div>
+
+<script>
+const DATA = /*DATA*/;
+
+// ---------- Aufbereitung ----------
+const DAYS = DATA.days;
+const COLORS = ['--d1', '--d2', '--d3'];
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const WD = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+const fmt = (n, d = 0) => n.toLocaleString('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d });
+const hm = s => { s = Math.round(s / 60); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+const clock = s => { s = ((Math.round(s) % 86400) + 86400) % 86400; return `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor(s / 60) % 60).padStart(2, '0')}`; };
+const dateOf = (day, secOfDay) => { const d = new Date(day.date + 'T12:00:00'); d.setDate(d.getDate() + Math.floor(secOfDay / 86400)); return d; };
+const dshort = d => `${WD[d.getDay()]} ${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.`;
+
+// Flache Punktliste über alle Etappen
+const P = [];
+DAYS.forEach((d, di) => {
+  for (let i = 0; i < d.t.length; i++) {
+    const clk = d.startSec + d.t[i];
+    P.push({ di, i, lat: d.lat[i], lon: d.lon[i], km: d.offsetKm + d.km[i], alt: d.alt[i], v: d.v[i], hr: d.hr[i], clk,
+      night: clk >= d.sunset && clk <= d.sunrise });
+  }
+});
+// leicht geglättetes Tempo für das Profil
+const smooth = (arr, w) => arr.map((_, i) => { let s = 0, n = 0; for (let j = Math.max(0, i - w); j <= Math.min(arr.length - 1, i + w); j++) { if (arr[j] > 0) { s += arr[j]; n++; } } return n ? s / n : 0; });
+const vS = smooth(P.map(p => p.v), 6), hrS = smooth(P.map(p => p.hr), 4);
+P.forEach((p, k) => { p.vs = vS[k]; p.hrs = hrS[k]; });
+const TOTAL = P[P.length - 1].km;
+const PAUSES = DAYS.flatMap((d, di) => d.pauses.map(p => ({ ...p, di, k: P.findIndex(q => q.di === di && q.i === p.i) })));
+const BORDER = P.findIndex(p => p.di === 2 && p.lon < 6.74);
+
+const tot = {
+  km: DAYS.reduce((s, d) => s + d.distance, 0) / 1000,
+  moving: DAYS.reduce((s, d) => s + d.moving, 0),
+  elapsed: DAYS.reduce((s, d) => s + d.elapsed, 0),
+  elev: DAYS.reduce((s, d) => s + d.elev, 0),
+  kcal: DAYS.reduce((s, d) => s + d.kcal, 0),
+  prs: DAYS.reduce((s, d) => s + d.prs, 0),
+};
+const avgHr = di => { const h = DAYS[di].hr.filter(x => x > 0); return h.reduce((a, b) => a + b, 0) / h.length; };
+const arrival = di => DAYS[di].startSec + DAYS[di].elapsed;
+const nightRide = di => Math.max(0, arrival(di) - DAYS[di].sunset);
+
+// ---------- Kopf ----------
+const finish = arrival(2);
+document.getElementById('lede').textContent =
+  `${fmt(tot.km)} Kilometer in drei Etappen, von Thüringen über Nordhessen und das Münsterland bis an die Amstel. ` +
+  `Die letzte Etappe war ${fmt(DAYS[2].distance / 1000)} km lang und endete um ${clock(finish)} Uhr nachts.`;
+document.getElementById('tiles').innerHTML = [
+  [fmt(tot.km), 'km', 'Strecke'],
+  [hm(tot.moving), 'h', 'Fahrzeit'],
+  [fmt(tot.elev), 'm', 'Höhenmeter'],
+  [fmt(tot.moving ? tot.km / (tot.moving / 3600) : 0, 1), 'km/h', 'Ø Tempo'],
+  [tot.prs, '', 'Strava-Bestleistungen'],
+].map(([v, u, l]) => `<div class="tile"><b>${v}${u ? `<small>${u}</small>` : ''}</b><span>${l}</span></div>`).join('');
+document.getElementById('legend').innerHTML = DAYS.map((d, i) => `<span><i style="background:var(${COLORS[i]})"></i>${d.name}</span>`).join('');
+
+// ---------- Karte ----------
+const map = document.getElementById('map'), mctx = map.getContext('2d');
+const merc = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) * 180 / Math.PI;
+const LON0 = Math.min(...P.map(p => p.lon)), LON1 = Math.max(...P.map(p => p.lon));
+const Y0 = merc(Math.min(...P.map(p => p.lat))), Y1 = merc(Math.max(...P.map(p => p.lat)));
+let mview = { s: 1, ox: 0, oy: 0, w: 0, h: 0 };
+const LABEL_POS = { 'Bad Berka': 'b', 'Erfurt': 'a', 'Eisenach': 'b', 'Kassel': 'a', 'Warburg': 'b', 'Paderborn': 'b', 'Rheda-Wiedenbrück': 'a', 'Warendorf': 'a', 'Münster': 'b', 'Ahaus': 'a', 'Zutphen': 'b', 'Apeldoorn': 'a', 'Amersfoort': 'b', 'Muiden': 'a', 'Amsterdam': 'b' };
+
+function sizeMap() {
+  const dpr = window.devicePixelRatio || 1, w = map.clientWidth;
+  const pad = w < 600 ? 26 : 48;
+  const geoW = LON1 - LON0, geoH = Y1 - Y0;
+  const s = (w - pad * 2) / geoW;
+  const h = Math.max(260, Math.round(geoH * s + pad * 2 + (w < 600 ? 20 : 40)));
+  const s2 = Math.min(s, (h - pad * 2) / geoH);
+  map.style.height = h + 'px';
+  map.width = w * dpr; map.height = h * dpr;
+  mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  mview = { s: s2, ox: (w - geoW * s2) / 2, oy: (h - geoH * s2) / 2 - (w < 600 ? 0 : 10), w, h };
+  P.forEach(p => { [p.x, p.y] = proj(p.lat, p.lon); });
+}
+const proj = (lat, lon) => [mview.ox + (lon - LON0) * mview.s, mview.oy + (Y1 - merc(lat)) * mview.s];
+
+function drawMap() {
+  const { w, h } = mview, c = mctx;
+  c.clearRect(0, 0, w, h);
+  // Gradnetz
+  c.strokeStyle = css('--grid'); c.lineWidth = 1; c.fillStyle = css('--muted');
+  c.font = `11px ${css('--font-data')}`;
+  for (let lon = Math.ceil(LON0 - 1); lon <= LON1 + 1; lon++) {
+    const [x] = proj(52, lon); if (x < 0 || x > w) continue;
+    c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke();
+    c.fillText(`${lon}°O`, x + 4, 14);
+  }
+  for (let lat = 50; lat <= 53; lat += 0.5) {
+    const [, y] = proj(lat, LON0); if (y < 0 || y > h) continue;
+    c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke();
+    c.fillText(`${fmt(lat, 1)}°N`, w - 50, y - 4);
+  }
+  // Grenze (geschätzt)
+  if (BORDER > 0) {
+    const b = P[BORDER];
+    c.save(); c.setLineDash([3, 4]); c.strokeStyle = css('--muted'); c.beginPath(); c.moveTo(b.x, b.y - 34); c.lineTo(b.x, b.y + 34); c.stroke(); c.restore();
+    c.fillStyle = css('--muted'); c.textAlign = 'center'; c.fillText('NL | DE', b.x, b.y + 48); c.textAlign = 'left';
+  }
+  const cur = cursorIdx();
+  // Strecke: blass komplett, kräftig bis zur aktuellen Position
+  for (const pass of [0, 1]) {
+    c.lineJoin = 'round'; c.lineCap = 'round';
+    DAYS.forEach((d, di) => {
+      c.strokeStyle = css(COLORS[di]);
+      c.globalAlpha = pass ? 1 : 0.22; c.lineWidth = pass ? 3 : 3;
+      c.beginPath(); let started = false;
+      for (let k = 0; k < P.length; k++) {
+        const p = P[k]; if (p.di !== di) continue; if (pass && k > cur) break;
+        started ? c.lineTo(p.x, p.y) : c.moveTo(p.x, p.y); started = true;
+      }
+      if (pass && P[cur].di === di) { const q = curPoint(); c.lineTo(q.x, q.y); }
+      c.stroke();
+    });
+  }
+  c.globalAlpha = 1;
+  // Pausen
+  c.strokeStyle = css('--ink'); c.lineWidth = 1.2;
+  PAUSES.forEach(p => { const q = P[p.k]; c.globalAlpha = p.k <= cur ? 0.75 : 0.25; c.beginPath(); c.arc(q.x, q.y, 2.5 + Math.sqrt(p.s / 60) * 0.9, 0, 7); c.stroke(); });
+  c.globalAlpha = 1;
+  // Orte
+  const narrow = w < 640;
+  DATA.places.forEach(pl => {
+    if (narrow && (pl.kind === '' || pl.kind === 'minor')) return;
+    if (!narrow && pl.kind === 'minor' && w < 900) return;
+    const [x, y] = proj(pl.lat, pl.lon); const big = pl.kind && pl.kind !== 'minor';
+    c.fillStyle = css('--surface'); c.strokeStyle = css('--ink'); c.lineWidth = big ? 2 : 1.2;
+    c.beginPath(); c.arc(x, y, big ? 5 : 3, 0, 7); c.fill(); c.stroke();
+    c.fillStyle = big ? css('--ink') : css('--ink-2');
+    c.font = big ? `600 13px ${css('--font-body')}` : `12px ${css('--font-body')}`;
+    const below = LABEL_POS[pl.n] === 'b';
+    const tw = c.measureText(pl.n).width;
+    let tx = x - tw / 2; tx = Math.max(4, Math.min(w - tw - 4, tx));
+    c.fillText(pl.n, tx, below ? y + 19 : y - 10);
+  });
+  // Cursor
+  const q = curPoint();
+  c.fillStyle = css(COLORS[q.di]); c.strokeStyle = css('--dot'); c.lineWidth = 3;
+  c.globalAlpha = 0.25; c.beginPath(); c.arc(q.x, q.y, 14, 0, 7); c.fill(); c.globalAlpha = 1;
+  c.beginPath(); c.arc(q.x, q.y, 7, 0, 7); c.fill(); c.stroke();
+}
+
+// ---------- Zustand ----------
+let pos = TOTAL;           // aktuelle Position in km
+let playing = false, holdUntil = 0, lastTs = 0, lastPause = -1;
+const cursorIdx = () => { let lo = 0, hi = P.length - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (P[m].km <= pos) lo = m; else hi = m - 1; } return lo; };
+function curPoint() {
+  const k = cursorIdx(), a = P[k], b = P[Math.min(k + 1, P.length - 1)];
+  if (b.di !== a.di || b.km === a.km) return a;
+  const f = (pos - a.km) / (b.km - a.km);
+  const L = (u, v) => u + (v - u) * f;
+  return { ...a, x: L(a.x, b.x), y: L(a.y, b.y), alt: L(a.alt, b.alt), clk: L(a.clk, b.clk), km: pos };
+}
+
+function updateHud() {
+  const q = curPoint(), d = DAYS[q.di], k = cursorIdx();
+  document.getElementById('r-day').innerHTML = `<span style="color:var(${COLORS[q.di]})">${d.name}</span>`;
+  document.getElementById('r-km').innerHTML = `${fmt(q.km, 1)}<small>/ ${fmt(TOTAL)} km</small>`;
+  const night = q.clk >= d.sunset && q.clk <= d.sunrise;
+  document.getElementById('r-clock').textContent = clock(q.clk);
+  document.getElementById('r-clock-l').innerHTML = `${dshort(dateOf(d, q.clk))}${night ? ' <span class="chip night">Nacht</span>' : ''}`;
+  document.getElementById('r-v').innerHTML = `${fmt(P[k].vs, 1)}<small>km/h</small>`;
+  document.getElementById('r-hr').innerHTML = P[k].hrs ? `${fmt(P[k].hrs)}<small>bpm</small>` : '–';
+  document.getElementById('r-alt').innerHTML = `${fmt(q.alt)}<small>m</small>`;
+}
+function render() { drawMap(); drawProfile(); updateHud(); }
+
+// ---------- Profil ----------
+const prof = document.getElementById('profile'), pctx = prof.getContext('2d');
+let metric = 'alt', pview = {};
+const METRICS = {
+  alt: { get: p => p.alt, unit: 'm', area: true },
+  v: { get: p => p.vs, unit: 'km/h' },
+  hr: { get: p => p.hrs, unit: 'bpm', skip0: true },
+};
+const niceTicks = (lo, hi, n = 4) => { const step0 = (hi - lo) / n, mag = 10 ** Math.floor(Math.log10(step0)); const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => s >= step0); const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(v); return out; };
+function sizeProfile() {
+  const dpr = window.devicePixelRatio || 1, w = prof.clientWidth, h = prof.clientHeight;
+  prof.width = w * dpr; prof.height = h * dpr; pctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  pview = { w, h, l: 44, r: 10, t: 28, b: 30 };
+}
+function drawProfile() {
+  const { w, h, l, r, t, b } = pview, c = pctx, M = METRICS[metric];
+  c.clearRect(0, 0, w, h);
+  const vals = P.map(M.get).filter(v => !M.skip0 || v > 0);
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  if (metric === 'alt') lo = 0;
+  if (metric === 'v') { lo = 0; hi = Math.min(hi, 45); }
+  if (metric === 'hr') { lo = Math.floor(lo / 10) * 10; }
+  const ticks = niceTicks(lo, hi); hi = Math.max(hi, ticks[ticks.length - 1]); lo = Math.min(lo, ticks[0]);
+  const X = km => l + (km / TOTAL) * (w - l - r), Y = v => t + (1 - (v - lo) / (hi - lo)) * (h - t - b);
+  pview.X = X;
+  // Nacht
+  c.fillStyle = css('--night');
+  let ns = null;
+  P.forEach((p, k) => { const nx = P[k + 1]; if (p.night && ns === null) ns = p.km; if (ns !== null && (!nx || !nx.night || nx.di !== p.di)) { c.fillRect(X(ns), t, Math.max(1, X(p.km) - X(ns)), h - t - b); ns = null; } });
+  // Raster
+  c.strokeStyle = css('--grid'); c.fillStyle = css('--muted'); c.lineWidth = 1; c.font = `11px ${css('--font-data')}`; c.textAlign = 'right';
+  ticks.forEach(v => { const y = Y(v); c.beginPath(); c.moveTo(l, y); c.lineTo(w - r, y); c.stroke(); c.fillText(fmt(v), l - 6, y + 4); });
+  c.textAlign = 'left'; c.fillText(M.unit, 4, t - 10);
+  // Etappengrenzen + Beschriftung
+  c.textAlign = 'center';
+  DAYS.forEach((d, di) => {
+    const x0 = X(d.offsetKm), x1 = X(d.offsetKm + d.distance / 1000);
+    if (di) { c.strokeStyle = css('--axis'); c.beginPath(); c.moveTo(x0, t - 18); c.lineTo(x0, h - b); c.stroke(); }
+    c.fillStyle = css(COLORS[di]); c.font = `600 12px ${css('--font-body')}`;
+    c.fillText(w < 600 ? `T${di + 1} · ${fmt(d.distance / 1000)}` : `${d.name} · ${fmt(d.distance / 1000)} km`, (x0 + x1) / 2, t - 10);
+  });
+  // x-Achse
+  c.fillStyle = css('--muted'); c.font = `11px ${css('--font-data')}`;
+  for (let km = 0; km <= TOTAL; km += (w < 600 ? 200 : 100)) c.fillText(`${km} km`, Math.min(X(km), w - 24), h - 8);
+  // Pausen
+  c.strokeStyle = css('--ink-2'); c.lineWidth = 1.5;
+  PAUSES.forEach(p => { const x = X(P[p.k].km); c.beginPath(); c.moveTo(x, h - b); c.lineTo(x, h - b - Math.min(12, 3 + p.s / 600)); c.stroke(); });
+  // Kurve je Etappe
+  DAYS.forEach((d, di) => {
+    const col = css(COLORS[di]); const pts = P.filter(p => p.di === di);
+    c.beginPath(); let first = true;
+    pts.forEach(p => { const v = M.get(p); if (M.skip0 && !v) return; first ? c.moveTo(X(p.km), Y(v)) : c.lineTo(X(p.km), Y(v)); first = false; });
+    c.strokeStyle = col; c.lineWidth = 1.6; c.stroke();
+    if (M.area) { c.lineTo(X(pts[pts.length - 1].km), Y(lo)); c.lineTo(X(pts[0].km), Y(lo)); c.closePath(); c.globalAlpha = 0.16; c.fillStyle = col; c.fill(); c.globalAlpha = 1; }
+  });
+  // Etappenmittel bei Tempo/Puls
+  if (metric !== 'alt') {
+    c.setLineDash([4, 4]); c.lineWidth = 1;
+    DAYS.forEach((d, di) => {
+      const m = metric === 'v' ? d.distance / d.moving * 3.6 : avgHr(di);
+      const y = Y(m); c.strokeStyle = css('--ink'); c.beginPath(); c.moveTo(X(d.offsetKm), y); c.lineTo(X(d.offsetKm + d.distance / 1000), y); c.stroke();
+      c.fillStyle = css('--ink'); c.textAlign = 'left'; c.fillText(`Ø ${fmt(m, metric === 'v' ? 1 : 0)}`, X(d.offsetKm) + 4, y - 5);
+    });
+    c.setLineDash([]);
+  }
+  // Cursor
+  const x = X(pos);
+  c.strokeStyle = css('--ink'); c.lineWidth = 1; c.beginPath(); c.moveTo(x, t); c.lineTo(x, h - b); c.stroke();
+  const k = cursorIdx(), v = M.get(P[k]);
+  if (!(M.skip0 && !v)) { c.fillStyle = css(COLORS[P[k].di]); c.strokeStyle = css('--surface'); c.lineWidth = 2; c.beginPath(); c.arc(x, Y(v), 4.5, 0, 7); c.fill(); c.stroke(); }
+}
+
+// ---------- Interaktion ----------
+const tip = document.getElementById('tip'), toast = document.getElementById('toast');
+function stop() { playing = false; document.getElementById('playIcon').innerHTML = '<path d="M7 4v16l13-8z"/>'; document.getElementById('play').setAttribute('aria-label', 'Replay starten'); }
+function start() {
+  if (pos >= TOTAL - 0.01) pos = 0;
+  playing = true; lastTs = 0; lastPause = PAUSES.findIndex(p => P[p.k].km >= pos) - 1;
+  document.getElementById('playIcon').innerHTML = '<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>';
+  document.getElementById('play').setAttribute('aria-label', 'Replay anhalten');
+  requestAnimationFrame(tick);
+}
+let toastTimer;
+function showToast(txt, ms) { toast.textContent = txt; toast.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { toast.hidden = true; }, ms); }
+function tick(ts) {
+  if (!playing) return;
+  if (!lastTs) lastTs = ts;
+  const dt = Math.min(0.1, (ts - lastTs) / 1000); lastTs = ts;
+  if (ts >= holdUntil) {
+    const dur = +document.getElementById('speed').value;
+    pos = Math.min(TOTAL, pos + TOTAL / dur * dt);
+    // Pause überfahren → kurz anhalten
+    const next = PAUSES[lastPause + 1];
+    if (next && P[next.k].km <= pos) {
+      lastPause++; pos = P[next.k].km;
+      if (next.s >= 900) { holdUntil = ts + 700; showToast(`Pause · ${hm(next.s)} h ab ${next.at} Uhr`, 1300); }
+    }
+    // Etappenwechsel
+    const k = cursorIdx();
+    if (k > 0 && P[k].di !== P[k - 1].di && P[k].i === 0 && pos - P[k].km < 1) { holdUntil = ts + 900; showToast(`${DAYS[P[k].di].name} · Start ${clock(DAYS[P[k].di].startSec)} Uhr in ${DAYS[P[k].di].frm}`, 1600); pos = P[k].km + 1.001; }
+    render();
+  }
+  if (pos >= TOTAL) { stop(); showToast(`Angekommen in Amsterdam · ${clock(finish)} Uhr`, 3000); render(); return; }
+  requestAnimationFrame(tick);
+}
+document.getElementById('play').onclick = () => playing ? stop() : start();
+document.getElementById('restart').onclick = () => { pos = 0; render(); start(); };
+
+function nearestOnMap(mx, my) { let best = -1, bd = 1e9; P.forEach((p, k) => { const d = (p.x - mx) ** 2 + (p.y - my) ** 2; if (d < bd) { bd = d; best = k; } }); return { k: best, d: Math.sqrt(bd) }; }
+map.addEventListener('pointermove', e => {
+  const rect = map.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const { k, d } = nearestOnMap(mx, my);
+  if (d > 40) { tip.hidden = true; return; }
+  const pz = PAUSES.find(p => Math.hypot(P[p.k].x - mx, P[p.k].y - my) < 8);
+  if (pz) { tip.hidden = false; tip.style.left = P[pz.k].x + 'px'; tip.style.top = P[pz.k].y + 'px'; tip.textContent = `Pause ${hm(pz.s)} h · ${pz.at} Uhr · km ${fmt(pz.km, 0)}`; }
+  else tip.hidden = true;
+  if (!playing) { pos = P[k].km; render(); }
+});
+map.addEventListener('pointerleave', () => { tip.hidden = true; });
+map.addEventListener('click', e => { const rect = map.getBoundingClientRect(); const { k, d } = nearestOnMap(e.clientX - rect.left, e.clientY - rect.top); if (d < 40) { pos = P[k].km; lastPause = PAUSES.findIndex(p => P[p.k].km >= pos) - 1; render(); } });
+const profPos = e => { const rect = prof.getBoundingClientRect(); const x = e.clientX - rect.left; return Math.max(0, Math.min(TOTAL, (x - pview.l) / (pview.w - pview.l - pview.r) * TOTAL)); };
+prof.addEventListener('pointermove', e => { if (!playing) { pos = profPos(e); render(); } });
+prof.addEventListener('click', e => { pos = profPos(e); lastPause = PAUSES.findIndex(p => P[p.k].km >= pos) - 1; render(); });
+document.querySelectorAll('.seg button').forEach(bn => bn.onclick = () => {
+  metric = bn.dataset.m; document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === bn)); drawProfile();
+});
+
+// ---------- Etappen ----------
+document.getElementById('days').innerHTML = DAYS.map((d, di) => {
+  const longest = d.pauses.reduce((a, p) => p.s > a.s ? p : a, { s: 0 });
+  const arr = arrival(di);
+  return `<article class="day" style="--c:var(${COLORS[di]})">
+    <header><span class="eyebrow">${dshort(new Date(d.date + 'T12:00:00'))} · Start ${clock(d.startSec)} Uhr</span>
+      <h3>${d.name}</h3><span class="route">${d.frm} → ${d.to}</span></header>
+    <dl>
+      <dt>Distanz</dt><dd>${fmt(d.distance / 1000, 1)} km</dd>
+      <dt>Fahrzeit</dt><dd>${hm(d.moving)} h</dd>
+      <dt>Stillstand</dt><dd>${hm(d.elapsed - d.moving)} h</dd>
+      <dt>Ø Tempo</dt><dd>${fmt(d.distance / d.moving * 3.6, 1)} km/h</dd>
+      <dt>Ø Puls</dt><dd>${fmt(avgHr(di))} bpm</dd>
+      <dt>Höhenmeter</dt><dd>${fmt(d.elev)} m</dd>
+      <dt>Längste Pause</dt><dd>${hm(longest.s)} h</dd>
+      <dt>Ankunft</dt><dd>${clock(arr)} Uhr${arr >= 86400 ? ' (+1)' : ''}</dd>
+    </dl>
+    <button class="btn" data-day="${di}">Etappe abspielen</button>
+  </article>`;
+}).join('');
+document.querySelectorAll('[data-day]').forEach(bn => bn.onclick = () => {
+  const di = +bn.dataset.day; stop(); pos = DAYS[di].offsetKm + 0.001; render(); start();
+  document.getElementById('h-map').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+});
+
+// ---------- Erkenntnisse ----------
+(function facts() {
+  const hrs = DAYS.map((_, i) => avgHr(i)), vs = DAYS.map(d => d.distance / d.moving * 3.6);
+  // kleine Paarvergleichsgrafik: Tempo bleibt, Puls fällt
+  const bars = (vals, max, unit, dec, f = v => fmt(v, dec)) => `<svg viewBox="0 0 300 92" role="img">${vals.map((v, i) => {
+    const y = 6 + i * 29, wv = Math.max(4, v / max * 200);
+    return `<text x="0" y="${y + 13}" font-size="12" fill="var(--muted)" font-family="var(--font-data)">T${i + 1}</text>
+      <rect x="26" y="${y}" width="${wv}" height="18" rx="3" fill="var(${COLORS[i]})"/>
+      <text x="${32 + wv}" y="${y + 13}" font-size="12.5" fill="var(--ink)" font-family="var(--font-data)">${f(v)} ${unit}</text>`;
+  }).join('')}</svg>`;
+  const allPause = tot.elapsed - tot.moving;
+  const longest = PAUSES.reduce((a, p) => p.s > a.s ? p : a);
+  const n3 = nightRide(2), n2 = nightRide(1);
+  document.getElementById('facts').innerHTML = `
+    <div class="fact"><span class="eyebrow">Fitness</span><h3>Gleiches Tempo, weniger Puls</h3>
+      <p>Das Tempo blieb an allen drei Tagen bei rund ${fmt(vs[1], 0)} bis ${fmt(vs[0], 0)} km/h. Der Durchschnittspuls fiel dabei von ${fmt(hrs[0])} auf ${fmt(hrs[2])} bpm. Ein Grund dürfte das flachere Gelände Richtung Holland sein: Tag 1 hatte 1.309 Höhenmeter, Tag 3 trotz 265 km nur 569.</p>
+      ${bars(hrs, 160, 'bpm', 0)}</div>
+    <div class="fact"><span class="eyebrow">Nachtfahrt</span><b>${hm(n3)} h</b><h3>im Dunkeln nach Amsterdam</h3>
+      <p>Die Sonne ging am 30. Mai gegen ${clock(DAYS[2].sunset)} Uhr unter. Danach ging es noch ${hm(n3)} Stunden weiter, durch die Veluwe und am Gooimeer entlang bis nach Amsterdam. Ankunft war um ${clock(finish)} Uhr. Auch Tag 2 endete erst ${hm(n2)} h nach Sonnenuntergang.</p></div>
+    <div class="fact"><span class="eyebrow">Pausen</span><b>${hm(allPause)} h</b><h3>Stillstand insgesamt</h3>
+      <p>Von ${hm(tot.elapsed)} Stunden unterwegs warst du ${hm(tot.moving)} h in Bewegung. Die längste Pause dauerte ${hm(longest.s)} h, an ${DAYS[longest.di].name} ab ${longest.at} Uhr bei km ${fmt(longest.km, 0)}.</p>
+      ${bars(DAYS.map(d => (d.elapsed - d.moving) / 3600), 7, 'h', 0, v => hm(v * 3600))}</div>`;
+})();
+
+// ---------- Umgerechnet ----------
+(function convert() {
+  const R = 6371, toR = x => x * Math.PI / 180, a = P[0], z = P[P.length - 1];
+  const crow = 2 * R * Math.asin(Math.sqrt(Math.sin(toR(z.lat - a.lat) / 2) ** 2 + Math.cos(toR(a.lat)) * Math.cos(toR(z.lat)) * Math.sin(toR(z.lon - a.lon) / 2) ** 2));
+  const revs = DAYS.reduce((s, d) => s + d.cadence * d.moving / 60, 0);
+  document.getElementById('convert').innerHTML = [
+    [fmt(Math.round(tot.kcal / 140)), `Stroopwafels, so viel Energie stecken in ${fmt(tot.kcal)} kcal (eine Waffel hat etwa 140 kcal)`],
+    [`${fmt(tot.elev / 330, 1)}×`, `auf den Eiffelturm, das sind ${fmt(tot.elev)} Höhenmeter bei 330 m Turmhöhe`],
+    [`≈ ${fmt(Math.round(revs / 1000) * 1000)}`, 'Kurbelumdrehungen, aus der Trittfrequenz und der Fahrzeit geschätzt'],
+    [`${fmt(crow)} km`, `Luftlinie von Bad Berka nach Amsterdam. Gefahren bist du ${fmt(tot.km / crow * 100 - 100)} % mehr.`],
+  ].map(([b, s]) => `<div class="conv"><b>${b}</b><span>${s}</span></div>`).join('');
+})();
+
+// ---------- Pausentabelle ----------
+(function pauseTable() {
+  const top = [...PAUSES].sort((a, b) => b.s - a.s).slice(0, 8), max = top[0].s;
+  document.getElementById('pauses').innerHTML = `<thead><tr><th>Etappe</th><th>Ab</th><th class="r">bei km</th><th class="r">Dauer</th><th style="width:40%"></th></tr></thead><tbody>${top.map(p =>
+    `<tr class="clickable" data-k="${p.k}" style="--c:var(${COLORS[p.di]})" tabindex="0"><td><span class="sw"></span>${DAYS[p.di].name}</td><td>${p.at} Uhr</td><td class="r">${fmt(p.km, 0)}</td><td class="r">${hm(p.s)} h</td><td><div class="bar" style="width:${p.s / max * 100}%"></div></td></tr>`).join('')}</tbody>`;
+  document.querySelectorAll('#pauses tr[data-k]').forEach(tr => {
+    const go = () => { stop(); pos = P[+tr.dataset.k].km; render(); document.getElementById('h-map').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); };
+    tr.onclick = go; tr.onkeydown = e => { if (e.key === 'Enter') go(); };
+  });
+})();
+
+// ---------- Start ----------
+function layout() { sizeMap(); sizeProfile(); render(); }
+layout();
+window.addEventListener('resize', layout);
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+document.fonts && document.fonts.ready.then(render);
+</script>

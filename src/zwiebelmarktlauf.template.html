@@ -114,6 +114,20 @@ td.n, th.n { text-align: right; font-family: var(--font-data); font-variant-nume
 .empty { border: 1.5px dashed var(--axis); border-radius: 6px; padding: 24px; display: flex; flex-direction: column; gap: 10px; color: var(--ink-2); }
 .empty code { font-family: var(--font-data); font-size: 13px; background: var(--onion-soft); color: var(--onion); padding: 1px 6px; border-radius: 3px; }
 
+/* Prognose */
+.scen { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.scen > div { border: 1px solid var(--grid); background: var(--surface); border-radius: 6px; padding: 18px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.scen > div.pick { border: 2px solid var(--onion); }
+.scen b { font-family: var(--font-display); font-weight: 850; font-stretch: 120%; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+.scen .pick b { color: var(--onion); }
+.scen p { font-size: 14px; color: var(--ink-2); }
+.scen .pace { font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+.why { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px 24px; }
+.why div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.why h3 { font-size: 16px; }
+.why p { font-size: 14px; color: var(--ink-2); }
+@media (max-width: 760px) { .scen { grid-template-columns: 1fr; } }
+
 /* Funfacts */
 .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0; border-top: 2px solid var(--ink); }
 .fact { padding: 18px 18px 18px 0; border-bottom: 1px solid var(--grid); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
@@ -242,6 +256,43 @@ a:focus-visible { outline: 2px solid var(--onion); outline-offset: 2px; }
       <h2>Zahlen zum Weitererzählen</h2>
     </div>
     <div class="facts" id="facts"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Ausblick 2027</div>
+      <h2>Was nächstes Jahr drin ist</h2>
+      <p>Eine Schätzung aus deinem Strava-Verlauf. Der größte Hebel ist mehr Umfang, der zweite eine gleichmäßigere Renneinteilung.</p>
+    </div>
+    <div class="panel">
+      <svg class="chart" id="ladder" viewBox="0 0 900 150" role="img" aria-label="Zielzeiten 2027 im Vergleich zu 2026"></svg>
+    </div>
+    <div class="scen">
+      <div>
+        <span class="eyebrow">Training wie bisher</span>
+        <b>56–57 min</b>
+        <span class="pace">≈ 4:50–4:55 /km</span>
+        <p>1–2 Läufe pro Woche. Der Gewinn kommt fast nur aus der Einteilung: weiter vorne starten und von Anfang an um 5:00 laufen statt 5:25.</p>
+      </div>
+      <div class="pick">
+        <span class="eyebrow">Mein Tipp · Ziel unter 55</span>
+        <b>53–55 min</b>
+        <span class="pace">≈ 4:34–4:44 /km</span>
+        <p>3 Läufe pro Woche mit 20–25 km. Dabei ein langer Lauf über 12–14 km und eine Tempoeinheit, zum Beispiel 3 × 2 km in 4:40.</p>
+      </div>
+      <div>
+        <span class="eyebrow">Ambitioniert</span>
+        <b>50–52 min</b>
+        <span class="pace">≈ 4:19–4:29 /km</span>
+        <p>4 Läufe pro Woche, 30 km und mehr, mit einem festen Plan über mehrere Monate. Machbar, aber ein deutlicher Schritt.</p>
+      </div>
+    </div>
+    <div class="why">
+      <div><h3>Wenig Umfang, viel Luft</h3><p>Seit März meist 25–65 km im Monat, also etwa 6–15 km pro Woche, fast nur 5-km-Läufe. Läufe über 10 km kommen kaum vor.</p></div>
+      <div><h3>Am Limit gelaufen</h3><p>Im Schnitt Puls 181, ein Viertel der Zeit über 189. Mit mehr Beißen holst du nichts mehr raus, nur mit besserer Form.</p></div>
+      <div><h3>Reserven im Rennen</h3><p>Die zweite Hälfte war 2:35 schneller. Kilometer 1 (5:29) und 3 (5:50) haben Zeit gekostet, das Ende lief in 4:52 und 4:45.</p></div>
+      <div><h3>Strava schätzt dich stärker ein</h3><p>Die 5-km-Prognose liegt bei 23:26. Hochgerechnet auf die etwa 11,6 km ergibt das rund 57 Minuten, schon mit der heutigen Form.</p></div>
+    </div>
   </section>
 
   <footer>
@@ -375,6 +426,26 @@ $("segs").innerHTML = DATA.segments.map(s => {
 
 // Bestzeiten
 $("efforts").innerHTML = DATA.efforts.map(([n, s]) => `<div class="effort"><span>${n}</span><b>${fmt(s)}</b><em>${fmt(s / (DATA.effDist[n] / 1000))} /km</em></div>`).join("");
+
+// Prognose-Leiter: Zeitachse 49–60 min, schneller links
+(function () {
+  const svg = $("ladder"), W = 900, L = 20, R = 20, lo = 49 * 60, hi = 60 * 60;
+  const x = s => L + (s - lo) / (hi - lo) * (W - L - R);
+  const axisY = 110;
+  el("line", { x1: L, x2: W - R, y1: axisY, y2: axisY, stroke: "var(--axis)" }, svg);
+  for (let m = 50; m <= 60; m++) {
+    el("line", { x1: x(m * 60), x2: x(m * 60), y1: axisY, y2: axisY + 5, stroke: "var(--axis)" }, svg);
+    el("text", { x: x(m * 60), y: axisY + 20, "text-anchor": "middle" }, svg, m + ":00");
+  }
+  [[56 * 60, 57 * 60, "Wie bisher", "var(--skin-soft)", "var(--skin)"], [53 * 60, 55 * 60, "Mein Tipp", "var(--onion-soft)", "var(--onion)"], [50 * 60, 52 * 60, "Ambitioniert", "var(--grid)", "var(--ink-2)"]].forEach(([a, b, n, f, s]) => {
+    el("rect", { x: x(a), y: 54, width: x(b) - x(a), height: 34, rx: 3, fill: f, stroke: s, "stroke-width": 1.5 }, svg);
+    el("text", { x: (x(a) + x(b)) / 2, y: 46, "text-anchor": "middle", class: "lbl-strong" }, svg, n);
+  });
+  const t = OFFICIAL;
+  el("line", { x1: x(t), x2: x(t), y1: 30, y2: axisY, stroke: "var(--ink)", "stroke-width": 2 }, svg);
+  el("circle", { cx: x(t), cy: axisY, r: 5, fill: "var(--ink)" }, svg);
+  el("text", { x: x(t) - 6, y: 24, "text-anchor": "end", class: "lbl-strong" }, svg, "2026: 58:49,6");
+})();
 
 // Funfacts
 $("facts").innerHTML = DATA.facts.map(([b, p]) => `<div class="fact"><b>${b}</b><p>${p}</p></div>`).join("");

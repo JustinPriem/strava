@@ -55,7 +55,7 @@ section { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 .cert { position: relative; background: var(--surface); border: 1px solid var(--grid); border-radius: 6px; padding: clamp(20px, 4vw, 40px); display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 32px; overflow: hidden; }
 .cert::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 8px; background: repeating-linear-gradient(90deg, var(--onion) 0 18px, var(--skin) 18px 36px); }
 .cert-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.cert h1 { font-size: clamp(40px, 8vw, 78px); font-weight: 900; font-stretch: 140%; line-height: 0.9; text-transform: uppercase; letter-spacing: -0.01em; }
+.cert h1 { font-size: clamp(40px, 7.4vw, 68px); font-weight: 900; font-stretch: 140%; line-height: 0.9; text-transform: uppercase; letter-spacing: -0.01em; }
 .cert h1 span { color: var(--onion); display: block; }
 .meta { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--ink-2); font-size: 14px; }
 .big-time { font-family: var(--font-display); font-weight: 900; font-stretch: 100%; font-size: clamp(64px, 12vw, 120px); line-height: 0.85; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
@@ -143,21 +143,21 @@ a:focus-visible { outline: 2px solid var(--onion); outline-offset: 2px; }
 
   <header class="cert">
     <div class="cert-main">
-      <div class="eyebrow">Sa 10.10.2026 · Weimar · Hauptlauf 11 km</div>
+      <div class="eyebrow">Sa 10.10.2026 · Weimar · 11,5 km · Startnummer 2422</div>
       <h1>Zwiebel&shy;markt&shy;lauf <span>2026</span></h1>
       <div class="big-time num">58:49<small>,6</small></div>
-      <div class="official">Offizielle Nettozeit laut Zeitmessung (raceresult)</div>
+      <div class="official">Offizielle Zeit laut Ergebnisliste (Hucke-Timing)</div>
       <div class="meta">
-        <span><b class="num">5:04,2</b> min/km</span>
-        <span><b class="num">11,8</b> km/h</span>
-        <span>2 Runden durch Ilmpark und Altstadt</span>
+        <span><b class="num">5:07</b> min/km</span>
+        <span><b class="num">11,7</b> km/h</span>
+        <span>Runde 1 <b class="num">30:30,5</b> · Runde 2 <b class="num">28:19,1</b></span>
       </div>
     </div>
     <div class="ranks">
-      <div class="rank"><span>Gesamtplatz</span><b class="onion num">415.</b></div>
-      <div class="rank"><span>Altersklasse Männer</span><b class="num">66.</b></div>
-      <div class="rank"><span>Ø Puls</span><b class="num">181</b></div>
-      <div class="rank"><span>Max. Puls</span><b class="num">195</b></div>
+      <div class="rank"><span>Gesamtplatz</span><b class="onion num">415.</b><span>von 1.294</span></div>
+      <div class="rank"><span>Altersklasse Männer</span><b class="num">66.</b><span>von 161</span></div>
+      <div class="rank"><span>Männerwertung</span><b class="num">365.</b><span>von 885</span></div>
+      <div class="rank"><span>Schneller als</span><b class="num">879</b><span>Läuferinnen und Läufer</span></div>
     </div>
   </header>
 
@@ -242,11 +242,38 @@ a:focus-visible { outline: 2px solid var(--onion); outline-offset: 2px; }
   <section id="field">
     <div class="sec-head">
       <div class="eyebrow">Teilnehmerfeld</div>
-      <h2>Platz 415 im Feld</h2>
+      <h2>Schneller als zwei Drittel des Feldes</h2>
+      <p>1.294 Läuferinnen und Läufer kamen ins Ziel. Mit 58:49,6 warst du gut fünf Minuten schneller als die Mitte des Feldes und einer von 484 Finishern unter einer Stunde.</p>
     </div>
-    <div class="empty">
-      <h3>Ergebnisliste wird nachgetragen</h3>
-      <p>Hier erscheinen Feldgröße, Zeitverteilung aller Finisher, dein Perzentil und der Vergleich mit deiner Altersklasse, sobald die Ergebnisliste von <code>my.raceresult.com/367642</code> eingelesen ist.</p>
+    <div class="strip" id="fieldstrip"></div>
+    <div class="panel">
+      <h3 style="margin-bottom:10px">Zielzeiten aller 1.294 Finisher</h3>
+      <svg class="chart" id="hist" viewBox="0 0 900 300" role="img" aria-label="Verteilung der Zielzeiten"></svg>
+      <div class="legend" style="margin-top:8px">
+        <span><i style="background:var(--axis)"></i>Finisher je 2 Minuten</span>
+        <span><i style="background:var(--onion)"></i>dein Block (58–60 min)</span>
+      </div>
+    </div>
+    <div class="two">
+      <div class="panel" style="display:flex;flex-direction:column;gap:12px">
+        <h3>Runde 2: 123 Leute überholt</h3>
+        <svg class="chart" id="bump" viewBox="0 0 420 260" role="img" aria-label="Platzierung nach Runde 1 und im Ziel"></svg>
+        <p style="font-size:14px;color:var(--ink-2)">Nach der ersten Runde lagst du nach Rundenzeit auf Platz 536. In Runde 2 bist du an 123 Leuten vorbeigezogen, nur 2 kamen an dir vorbei. Deine zweite Runde war die 312.-schnellste des ganzen Feldes.</p>
+      </div>
+      <div class="panel" style="display:flex;flex-direction:column;gap:12px">
+        <h3>Knapper geht es nicht</h3>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Platz</th><th class="n">Zeit</th><th class="n">Abstand</th></tr></thead>
+          <tbody>
+            <tr><td>413.</td><td class="n">58:49,0</td><td class="n">−0,6 s</td></tr>
+            <tr><td>414.</td><td class="n">58:49,5</td><td class="n">−0,1 s</td></tr>
+            <tr style="background:var(--onion-soft)"><td><b>415. Du</b></td><td class="n"><b>58:49,6</b></td><td class="n">–</td></tr>
+            <tr><td>416.</td><td class="n">58:50,1</td><td class="n">+0,5 s</td></tr>
+            <tr><td>417.</td><td class="n">58:52,3</td><td class="n">+2,7 s</td></tr>
+          </tbody>
+        </table></div>
+        <p style="font-size:14px;color:var(--ink-2)">Eine Zehntelsekunde fehlte zu Platz 414, und innerhalb von 1,1 Sekunden kamen vier Läufer ins Ziel. Im Fenster von ±10 Sekunden um deine Zeit kamen 17 weitere Läufer ins Ziel.</p>
+      </div>
     </div>
   </section>
 
@@ -271,19 +298,19 @@ a:focus-visible { outline: 2px solid var(--onion); outline-offset: 2px; }
       <div>
         <span class="eyebrow">Training wie bisher</span>
         <b>56–57 min</b>
-        <span class="pace">≈ 4:50–4:55 /km</span>
+        <span class="pace">≈ 4:52–4:57 /km · 2026 Platz 284–333</span>
         <p>1–2 Läufe pro Woche. Der Gewinn kommt fast nur aus der Einteilung: weiter vorne starten und von Anfang an um 5:00 laufen statt 5:25.</p>
       </div>
       <div class="pick">
         <span class="eyebrow">Mein Tipp · Ziel unter 55</span>
         <b>53–55 min</b>
-        <span class="pace">≈ 4:34–4:44 /km</span>
+        <span class="pace">≈ 4:37–4:47 /km · 2026 Platz 179–238</span>
         <p>3 Läufe pro Woche mit 20–25 km. Dabei ein langer Lauf über 12–14 km und eine Tempoeinheit, zum Beispiel 3 × 2 km in 4:40.</p>
       </div>
       <div>
         <span class="eyebrow">Ambitioniert</span>
         <b>50–52 min</b>
-        <span class="pace">≈ 4:19–4:29 /km</span>
+        <span class="pace">≈ 4:21–4:31 /km · 2026 Platz 97–157</span>
         <p>4 Läufe pro Woche, 30 km und mehr, mit einem festen Plan über mehrere Monate. Machbar, aber ein deutlicher Schritt.</p>
       </div>
     </div>
@@ -291,12 +318,12 @@ a:focus-visible { outline: 2px solid var(--onion); outline-offset: 2px; }
       <div><h3>Wenig Umfang, viel Luft</h3><p>Seit März meist 25–65 km im Monat, also etwa 6–15 km pro Woche, fast nur 5-km-Läufe. Läufe über 10 km kommen kaum vor.</p></div>
       <div><h3>Am Limit gelaufen</h3><p>Im Schnitt Puls 181, ein Viertel der Zeit über 189. Mit mehr Beißen holst du nichts mehr raus, nur mit besserer Form.</p></div>
       <div><h3>Reserven im Rennen</h3><p>Die zweite Hälfte war 2:35 schneller. Kilometer 1 (5:29) und 3 (5:50) haben Zeit gekostet, das Ende lief in 4:52 und 4:45.</p></div>
-      <div><h3>Strava schätzt dich stärker ein</h3><p>Die 5-km-Prognose liegt bei 23:26. Hochgerechnet auf die etwa 11,6 km ergibt das rund 57 Minuten, schon mit der heutigen Form.</p></div>
+      <div><h3>Strava schätzt dich stärker ein</h3><p>Die 5-km-Prognose liegt bei 23:26. Hochgerechnet auf die 11,5 km ergibt das rund 57 Minuten, schon mit der heutigen Form.</p></div>
     </div>
   </section>
 
   <footer>
-    <span>Offizielles Ergebnis: raceresult, Veranstaltung 367642. Verlauf, Puls, Höhe, Segmente und Bestzeiten: Strava-Aktivität vom 10.10.2026.</span>
+    <span>Offizielles Ergebnis: Ergebnisliste 11,5 km (Hucke-Timing / raceresult, Veranstaltung 367642). Die Urkunde nennt 5:04,2 min/km, das entspricht etwa 11,6 km; hier gerechnet mit den 11,5 km der Ergebnisliste. Verlauf, Puls, Höhe, Segmente und Bestzeiten: Strava-Aktivität vom 10.10.2026.</span>
     <span>Strava lief nach dem Ziel noch knapp 6 Minuten weiter. Alle Verlaufswerte hier enden am Zielsprint; Zeit und Tempo oben stammen aus der Zeitmessung.</span>
     <a href="https://my.raceresult.com/367642/results">Ergebnisliste auf raceresult</a>
   </footer>
@@ -312,22 +339,21 @@ function el(tag, attrs, parent, text) { const e = document.createElementNS(NS, t
 
 const pts = DATA.pts; // [t, d, hr, alt, lat, lon, v]
 const OFFICIAL = 3529.6;
-const OFF_KM = OFFICIAL / 304.2; // Distanz aus offizieller Zeit und Pace
+const OFF_KM = 11.5; // laut Ergebnisliste
 
 // Kennzahlen
 $("strip").innerHTML = [
-  [de(OFF_KM, 1) + " km", "offizielle Strecke (aus Zeit ÷ Pace)"],
+  [de(OFF_KM, 1) + " km", "offizielle Strecke"],
   [de(DATA.gpsKm, 2) + " km", "per GPS gemessen"],
   [DATA.elevGain + " m", "Höhenmeter (Strava)"],
+  ["181 / 195", "Ø / max. Puls"],
   ["970 kcal", "verbrannt"],
   ["218", "Relative Effort"],
-  ["10/10", "gefühlte Anstrengung"]
 ].map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join("");
 
 // Negativ-Split
-const [h1, h2] = DATA.halves;
-$("negsplit").textContent = "−" + fmt(h1 - h2);
-$("negsplit-txt").textContent = `Negativ-Split: erste Hälfte ${fmt(h1)}, zweite Hälfte ${fmt(h2)} (GPS-Hälften).`;
+$("negsplit").textContent = "−2:11,4";
+$("negsplit-txt").textContent = "Negativ-Split laut Zeitmessung: Runde 1 in 30:30,5, Runde 2 in 28:19,1. Nur 79 von 1.294 Finishern haben sich in Runde 2 stärker gesteigert.";
 
 // Splits-Diagramm
 (function () {
@@ -426,6 +452,42 @@ $("segs").innerHTML = DATA.segments.map(s => {
 
 // Bestzeiten
 $("efforts").innerHTML = DATA.efforts.map(([n, s]) => `<div class="effort"><span>${n}</span><b>${fmt(s)}</b><em>${fmt(s / (DATA.effDist[n] / 1000))} /km</em></div>`).join("");
+
+// Teilnehmerfeld
+(function () {
+  const F = DATA.field;
+  $("fieldstrip").innerHTML = [
+    ["Top 32 %", "gesamt (415 von 1.294)"],
+    ["Top 41 %", "Männer (365 von 885)"],
+    ["Top 41 %", "AK Männer (66 von 161)"],
+    [fmt(F.median), "Median aller Finisher"],
+    [fmt(F.akMedian), "Median AK Männer"],
+    [fmt(F.winner), "Siegerzeit"]
+  ].map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join("");
+  // Histogramm
+  const svg = $("hist"), W = 900, H = 300, L = 40, R = 10, T = 14, B = 34;
+  const bins = F.bins, lo = 34, hi = 114, max = 120;
+  const x = m => L + (m - lo) / (hi - lo) * (W - L - R), y = n => T + (1 - n / max) * (H - T - B);
+  [0, 40, 80, 120].forEach(n => { el("line", { x1: L, x2: W - R, y1: y(n), y2: y(n), stroke: "var(--grid)" }, svg); el("text", { x: L - 6, y: y(n) + 4, "text-anchor": "end" }, svg, n); });
+  bins.forEach(([m, n]) => el("rect", { x: x(m) + 1, y: y(n), width: x(m + 2) - x(m) - 2, height: H - B - y(n), fill: m === 58 ? "var(--onion)" : "var(--axis)", rx: 1.5 }, svg));
+  for (let m = 40; m <= 110; m += 10) el("text", { x: x(m), y: H - B + 18, "text-anchor": "middle" }, svg, m + " min");
+  const xm = x(OFFICIAL / 60);
+  el("line", { x1: xm, x2: xm, y1: T + 10, y2: H - B, stroke: "var(--ink)", "stroke-width": 1.5, "stroke-dasharray": "3 3" }, svg);
+  el("text", { x: xm - 8, y: T + 6, "text-anchor": "end", class: "lbl-strong" }, svg, "Du · 58:49,6");
+  const xmed = x(F.median / 60);
+  el("line", { x1: xmed, x2: xmed, y1: T + 40, y2: H - B, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 4" }, svg);
+  el("text", { x: xmed + 6, y: T + 52 }, svg, "Median " + fmt(F.median));
+  // Bump: Runde 1 -> Ziel
+  const b = $("bump"), bx1 = 70, bx2 = 350, yr = r => 20 + (r - 380) / (560 - 380) * 200;
+  [400, 450, 500, 550].forEach(r => { el("line", { x1: bx1, x2: bx2, y1: yr(r), y2: yr(r), stroke: "var(--grid)" }, b); el("text", { x: bx1 - 10, y: yr(r) + 4, "text-anchor": "end" }, b, r + "."); });
+  el("text", { x: bx1, y: 248, "text-anchor": "middle" }, b, "nach Runde 1");
+  el("text", { x: bx2, y: 248, "text-anchor": "middle" }, b, "im Ziel");
+  el("line", { x1: bx1, y1: yr(536), x2: bx2, y2: yr(415), stroke: "var(--onion)", "stroke-width": 4, "stroke-linecap": "round" }, b);
+  el("circle", { cx: bx1, cy: yr(536), r: 7, fill: "var(--surface)", stroke: "var(--onion)", "stroke-width": 3 }, b);
+  el("circle", { cx: bx2, cy: yr(415), r: 8, fill: "var(--onion)" }, b);
+  el("text", { x: bx1 + 14, y: yr(536) + 5, class: "lbl-strong" }, b, "536.");
+  el("text", { x: bx2 - 14, y: yr(415) - 12, "text-anchor": "end", class: "lbl-strong" }, b, "415.");
+})();
 
 // Prognose-Leiter: Zeitachse 49–60 min, schneller links
 (function () {

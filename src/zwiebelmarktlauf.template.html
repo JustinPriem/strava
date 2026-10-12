@@ -1,0 +1,381 @@
+<title>Zwiebelmarktlauf 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@75..150,500..900&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: eine Spalte wie ein Startunterlagen-Heft. Oben die Urkunde, darunter Rennverlauf, Strecke, Körper, Segmente, Feld und Kuriositäten. */
+:root {
+  --bg: #f4f2f5;
+  --surface: #fcfbfd;
+  --ink: #1d1420;
+  --ink-2: #554a59;
+  --muted: #877c8b;
+  --grid: #e3dee6;
+  --axis: #c6bec9;
+  --onion: #9b2c5e;
+  --onion-soft: rgba(155,44,94,0.12);
+  --skin: #b07d1f;
+  --skin-soft: rgba(176,125,31,0.16);
+  --z1: #cfd6dd; --z2: #8fb3cf; --z3: #e0b85a; --z4: #d9723a; --z5: #9b2c5e;
+  --good: #1d7a3a;
+  --font-display: "Anybody", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141016; --surface: #1d1820; --ink: #f3eef4; --ink-2: #c9bdcc; --muted: #918695;
+    --grid: #2e2731; --axis: #463d4a; --onion: #e0679a; --onion-soft: rgba(224,103,154,0.16);
+    --skin: #e0b252; --skin-soft: rgba(224,178,82,0.16);
+    --z1: #3d454d; --z2: #4f7fa6; --z3: #c99d3c; --z4: #d9723a; --z5: #e0679a; --good: #5fcf7f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141016; --surface: #1d1820; --ink: #f3eef4; --ink-2: #c9bdcc; --muted: #918695;
+  --grid: #2e2731; --axis: #463d4a; --onion: #e0679a; --onion-soft: rgba(224,103,154,0.16);
+  --skin: #e0b252; --skin-soft: rgba(224,178,82,0.16);
+  --z1: #3d454d; --z2: #4f7fa6; --z3: #c99d3c; --z4: #d9723a; --z5: #e0679a; --good: #5fcf7f;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+.page { max-width: 1000px; margin: 0 auto; padding-inline: 20px; padding-block: 36px 72px; display: flex; flex-direction: column; gap: 64px; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+h2 { font-size: clamp(28px, 4.4vw, 40px); font-weight: 850; font-stretch: 125%; line-height: 1; text-transform: uppercase; letter-spacing: 0.01em; }
+h3 { font-size: 18px; font-weight: 750; font-stretch: 110%; }
+p { margin: 0; max-width: 66ch; }
+.eyebrow { font-family: var(--font-data); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; font-family: var(--font-data); }
+section { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.sec-head { display: flex; flex-direction: column; gap: 8px; }
+.sec-head p { color: var(--ink-2); }
+
+/* Urkunde */
+.cert { position: relative; background: var(--surface); border: 1px solid var(--grid); border-radius: 6px; padding: clamp(20px, 4vw, 40px); display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 32px; overflow: hidden; }
+.cert::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 8px; background: repeating-linear-gradient(90deg, var(--onion) 0 18px, var(--skin) 18px 36px); }
+.cert-main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.cert h1 { font-size: clamp(40px, 8vw, 78px); font-weight: 900; font-stretch: 140%; line-height: 0.9; text-transform: uppercase; letter-spacing: -0.01em; }
+.cert h1 span { color: var(--onion); display: block; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--ink-2); font-size: 14px; }
+.big-time { font-family: var(--font-display); font-weight: 900; font-stretch: 100%; font-size: clamp(64px, 12vw, 120px); line-height: 0.85; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.big-time small { font-size: 0.4em; color: var(--muted); font-weight: 700; }
+.official { font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+.ranks { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--grid); border: 1px solid var(--grid); border-radius: 4px; overflow: hidden; align-self: start; }
+.rank { background: var(--surface); padding: 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rank b { font-family: var(--font-display); font-weight: 850; font-stretch: 120%; font-size: clamp(30px, 5vw, 44px); line-height: 1; font-variant-numeric: tabular-nums; }
+.rank b.onion { color: var(--onion); }
+.rank span { font-size: 13px; color: var(--ink-2); }
+@media (max-width: 760px) { .cert { grid-template-columns: 1fr; } }
+
+/* Kennzahlen-Leiste */
+.strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--grid); }
+.strip div { padding: 14px 14px 14px 0; display: flex; flex-direction: column; gap: 2px; }
+.strip b { font-family: var(--font-data); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.strip span { font-size: 13px; color: var(--muted); }
+
+/* Diagramme */
+.panel { background: var(--surface); border: 1px solid var(--grid); border-radius: 6px; padding: 18px; min-width: 0; }
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.chart text { font-family: var(--font-data); font-size: 11px; fill: var(--muted); }
+.chart .lbl-strong { fill: var(--ink); font-weight: 600; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.callout { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+.callout b { font-family: var(--font-display); font-weight: 850; font-stretch: 120%; font-size: 34px; color: var(--good); line-height: 1; }
+.two { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; }
+@media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+
+/* Zonen */
+.zonebar { display: flex; height: 34px; border-radius: 4px; overflow: hidden; }
+.zonebar div { min-width: 2px; }
+.zones { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.zones div { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--ink-2); min-width: 0; }
+.zones b { font-family: var(--font-data); font-size: 17px; color: var(--ink); }
+@media (max-width: 560px) { .zones { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* Tabellen */
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th { text-align: left; font-family: var(--font-data); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 400; padding: 8px 10px; border-bottom: 1px solid var(--axis); white-space: nowrap; }
+td { padding: 10px; border-bottom: 1px solid var(--grid); vertical-align: baseline; }
+td.n, th.n { text-align: right; font-family: var(--font-data); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.delta { color: var(--good); font-weight: 600; }
+.pill { font-family: var(--font-data); font-size: 11px; padding: 2px 7px; border-radius: 99px; background: var(--skin-soft); color: var(--skin); white-space: nowrap; }
+
+/* Bestzeiten */
+.efforts { display: grid; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); gap: 10px; }
+.effort { border: 1px solid var(--grid); background: var(--surface); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
+.effort span { font-size: 12px; color: var(--muted); font-family: var(--font-data); text-transform: uppercase; letter-spacing: 0.06em; }
+.effort b { font-family: var(--font-display); font-weight: 850; font-stretch: 115%; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums; }
+.effort em { font-style: normal; font-size: 12px; color: var(--ink-2); }
+
+/* Feld */
+.empty { border: 1.5px dashed var(--axis); border-radius: 6px; padding: 24px; display: flex; flex-direction: column; gap: 10px; color: var(--ink-2); }
+.empty code { font-family: var(--font-data); font-size: 13px; background: var(--onion-soft); color: var(--onion); padding: 1px 6px; border-radius: 3px; }
+
+/* Funfacts */
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0; border-top: 2px solid var(--ink); }
+.fact { padding: 18px 18px 18px 0; border-bottom: 1px solid var(--grid); display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.fact b { font-family: var(--font-display); font-weight: 850; font-stretch: 125%; font-size: 36px; line-height: 1; color: var(--onion); font-variant-numeric: tabular-nums; }
+.fact p { font-size: 14px; color: var(--ink-2); }
+
+footer { font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--grid); padding-top: 18px; }
+footer a { color: var(--ink-2); }
+a:focus-visible { outline: 2px solid var(--onion); outline-offset: 2px; }
+</style>
+
+<div class="page">
+
+  <header class="cert">
+    <div class="cert-main">
+      <div class="eyebrow">Sa 10.10.2026 · Weimar · Hauptlauf 11 km</div>
+      <h1>Zwiebel&shy;markt&shy;lauf <span>2026</span></h1>
+      <div class="big-time num">58:49<small>,6</small></div>
+      <div class="official">Offizielle Nettozeit laut Zeitmessung (raceresult)</div>
+      <div class="meta">
+        <span><b class="num">5:04,2</b> min/km</span>
+        <span><b class="num">11,8</b> km/h</span>
+        <span>2 Runden durch Ilmpark und Altstadt</span>
+      </div>
+    </div>
+    <div class="ranks">
+      <div class="rank"><span>Gesamtplatz</span><b class="onion num">415.</b></div>
+      <div class="rank"><span>Altersklasse Männer</span><b class="num">66.</b></div>
+      <div class="rank"><span>Ø Puls</span><b class="num">181</b></div>
+      <div class="rank"><span>Max. Puls</span><b class="num">195</b></div>
+    </div>
+  </header>
+
+  <div class="strip" id="strip"></div>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Rennverlauf</div>
+      <h2>Hinten raus immer schneller</h2>
+      <p>Der erste Kilometer ging im Startgedränge verloren, Kilometer 3 war der langsamste. Ab der zweiten Runde wurde jeder Abschnitt schneller, die letzten zwei Kilometer liefen unter 4:55.</p>
+    </div>
+    <div class="panel">
+      <div class="callout" style="margin-bottom:14px">
+        <b class="num" id="negsplit"></b>
+        <span id="negsplit-txt" style="color:var(--ink-2)"></span>
+      </div>
+      <svg class="chart" id="splits" viewBox="0 0 900 300" role="img" aria-label="Tempo pro Kilometer"></svg>
+      <div class="legend" style="margin-top:8px">
+        <span><i style="background:var(--skin)"></i>Tempo pro km (GPS, höher = schneller)</span>
+        <span><i style="background:var(--onion)"></i>Ø Puls im Kilometer</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Strecke</div>
+      <h2>Zweimal um die Ilm</h2>
+      <p>Vom Start in der Innenstadt hinunter in den Ilmpark, vorbei an Goethes Gartenhaus, hinauf zur Falkenburg und zurück. Die Linie ist nach Tempo eingefärbt.</p>
+    </div>
+    <div class="two">
+      <div class="panel">
+        <svg class="chart" id="map" viewBox="0 0 420 560" role="img" aria-label="Streckenkarte"></svg>
+        <div class="legend" style="margin-top:8px">
+          <span><i style="background:var(--skin)"></i>langsamer</span>
+          <span><i style="background:var(--onion)"></i>schneller</span>
+          <span><i style="background:var(--ink);border-radius:50%"></i>Start / Ziel</span>
+        </div>
+      </div>
+      <div class="panel" style="display:flex;flex-direction:column;gap:12px">
+        <h3>Puls und Höhe über die Strecke</h3>
+        <svg class="chart" id="profile" viewBox="0 0 440 420" role="img" aria-label="Puls- und Höhenprofil"></svg>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Herz</div>
+      <h2>Fast eine Stunde am Anschlag</h2>
+      <p id="zone-txt"></p>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:16px">
+      <div class="zonebar" id="zonebar"></div>
+      <div class="zones" id="zones"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Strava-Segmente</div>
+      <h2>Zweimal gelaufen, zweimal gemessen</h2>
+      <p>Jedes Segment der Runde hast du zweimal passiert. Die zweite Runde war auf der großen Schleife über zwei Minuten schneller.</p>
+    </div>
+    <div class="panel tbl-wrap">
+      <table>
+        <thead><tr><th>Segment</th><th class="n">Länge</th><th class="n">Durchgang A</th><th class="n">Durchgang B</th><th class="n">Differenz</th></tr></thead>
+        <tbody id="segs"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Bestzeiten</div>
+      <h2>16 Rekorde an einem Tag</h2>
+      <p>Strava hat in diesem Lauf 16 Bestleistungen erkannt, darunter Bestzeiten auf allen Standarddistanzen von 400 m bis 10 km.</p>
+    </div>
+    <div class="efforts" id="efforts"></div>
+  </section>
+
+  <section id="field">
+    <div class="sec-head">
+      <div class="eyebrow">Teilnehmerfeld</div>
+      <h2>Platz 415 im Feld</h2>
+    </div>
+    <div class="empty">
+      <h3>Ergebnisliste wird nachgetragen</h3>
+      <p>Hier erscheinen Feldgröße, Zeitverteilung aller Finisher, dein Perzentil und der Vergleich mit deiner Altersklasse, sobald die Ergebnisliste von <code>my.raceresult.com/367642</code> eingelesen ist.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">Funfacts</div>
+      <h2>Zahlen zum Weitererzählen</h2>
+    </div>
+    <div class="facts" id="facts"></div>
+  </section>
+
+  <footer>
+    <span>Offizielles Ergebnis: raceresult, Veranstaltung 367642. Verlauf, Puls, Höhe, Segmente und Bestzeiten: Strava-Aktivität vom 10.10.2026.</span>
+    <span>Strava lief nach dem Ziel noch knapp 6 Minuten weiter. Alle Verlaufswerte hier enden am Zielsprint; Zeit und Tempo oben stammen aus der Zeitmessung.</span>
+    <a href="https://my.raceresult.com/367642/results">Ergebnisliste auf raceresult</a>
+  </footer>
+</div>
+
+<script>
+const DATA = /*DATA*/null;
+const NS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
+const fmt = s => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0"); };
+const de = (n, d = 0) => n.toLocaleString("de-DE", { minimumFractionDigits: d, maximumFractionDigits: d });
+function el(tag, attrs, parent, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; if (parent) parent.appendChild(e); return e; }
+
+const pts = DATA.pts; // [t, d, hr, alt, lat, lon, v]
+const OFFICIAL = 3529.6;
+const OFF_KM = OFFICIAL / 304.2; // Distanz aus offizieller Zeit und Pace
+
+// Kennzahlen
+$("strip").innerHTML = [
+  [de(OFF_KM, 1) + " km", "offizielle Strecke (aus Zeit ÷ Pace)"],
+  [de(DATA.gpsKm, 2) + " km", "per GPS gemessen"],
+  [DATA.elevGain + " m", "Höhenmeter (Strava)"],
+  ["970 kcal", "verbrannt"],
+  ["218", "Relative Effort"],
+  ["10/10", "gefühlte Anstrengung"]
+].map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join("");
+
+// Negativ-Split
+const [h1, h2] = DATA.halves;
+$("negsplit").textContent = "−" + fmt(h1 - h2);
+$("negsplit-txt").textContent = `Negativ-Split: erste Hälfte ${fmt(h1)}, zweite Hälfte ${fmt(h2)} (GPS-Hälften).`;
+
+// Splits-Diagramm
+(function () {
+  const svg = $("splits"), W = 900, H = 300, L = 54, R = 50, T = 16, B = 40;
+  const sp = DATA.splits.filter(s => s[0] === Math.floor(s[0]));
+  const slow = 360, fast = 270; // 6:00 bis 4:30
+  const x = i => L + (i + 0.5) * (W - L - R) / sp.length;
+  const y = s => T + (s - fast) / (slow - fast) * (H - T - B);
+  for (let s = fast; s <= slow; s += 15) {
+    el("line", { x1: L, x2: W - R, y1: y(s), y2: y(s), stroke: "var(--grid)" }, svg);
+    el("text", { x: L - 8, y: y(s) + 4, "text-anchor": "end" }, svg, fmt(s));
+  }
+  const hrLo = 140, hrHi = 200, yh = h => T + (hrHi - h) / (hrHi - hrLo) * (H - T - B);
+  [150, 170, 190].forEach(h => el("text", { x: W - R + 8, y: yh(h) + 4 }, svg, h));
+  const bw = (W - L - R) / sp.length * 0.56;
+  sp.forEach((s, i) => {
+    el("rect", { x: x(i) - bw / 2, y: y(s[1]), width: bw, height: H - B - y(s[1]), fill: "var(--skin-soft)" }, svg);
+    el("rect", { x: x(i) - bw / 2, y: y(s[1]) - 1.5, width: bw, height: 3, fill: "var(--skin)" }, svg);
+    el("text", { x: x(i), y: y(s[1]) - 8, "text-anchor": "middle", class: "lbl-strong" }, svg, fmt(s[1]));
+    el("text", { x: x(i), y: H - B + 18, "text-anchor": "middle" }, svg, "km " + s[0]);
+  });
+  el("polyline", { points: sp.map((s, i) => x(i) + "," + yh(s[2])).join(" "), fill: "none", stroke: "var(--onion)", "stroke-width": 2.5, "stroke-linejoin": "round" }, svg);
+  sp.forEach((s, i) => el("circle", { cx: x(i), cy: yh(s[2]), r: 3.5, fill: "var(--onion)" }, svg));
+  el("text", { x: L - 8, y: T - 4, "text-anchor": "end" }, svg, "min/km");
+  el("text", { x: W - R + 8, y: T - 4 }, svg, "bpm");
+})();
+
+// Karte
+(function () {
+  const svg = $("map"), W = 420, H = 560, P = 24;
+  const lats = pts.map(p => p[4]), lons = pts.map(p => p[5]);
+  const k = Math.cos(50.975 * Math.PI / 180);
+  const minLa = Math.min(...lats), maxLa = Math.max(...lats), minLo = Math.min(...lons), maxLo = Math.max(...lons);
+  const sx = (W - 2 * P) / ((maxLo - minLo) * k), sy = (H - 2 * P) / (maxLa - minLa), s = Math.min(sx, sy);
+  const ox = (W - (maxLo - minLo) * k * s) / 2, oy = (H - (maxLa - minLa) * s) / 2;
+  const X = p => ox + (p[5] - minLo) * k * s, Y = p => oy + (maxLa - p[4]) * s;
+  el("polyline", { points: pts.map(p => X(p) + "," + Y(p)).join(" "), fill: "none", stroke: "var(--grid)", "stroke-width": 12, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
+  // Farbe nach Tempo
+  const vs = pts.map(p => p[6]).filter(v => v > 2);
+  const lo = 2.8, hi = 3.8;
+  for (let i = 1; i < pts.length; i++) {
+    const v = (pts[i][6] + pts[i - 1][6]) / 2, f = Math.max(0, Math.min(1, (v - lo) / (hi - lo)));
+    el("line", { x1: X(pts[i - 1]), y1: Y(pts[i - 1]), x2: X(pts[i]), y2: Y(pts[i]), stroke: `color-mix(in srgb, var(--onion) ${Math.round(f * 100)}%, var(--skin))`, "stroke-width": 4, "stroke-linecap": "round" }, svg);
+  }
+  // km-Marken
+  for (let km = 1; km <= 11; km++) {
+    const p = pts.find(q => q[1] >= km * 1000); if (!p) continue;
+    const g = el("g", {}, svg);
+    el("circle", { cx: X(p), cy: Y(p), r: 9, fill: "var(--surface)", stroke: "var(--ink-2)", "stroke-width": 1 }, g);
+    el("text", { x: X(p), y: Y(p) + 3.5, "text-anchor": "middle", style: "font-size:9.5px;fill:var(--ink)" }, g, km);
+  }
+  const st = pts[0], en = pts[pts.length - 1];
+  el("circle", { cx: X(st), cy: Y(st), r: 7, fill: "var(--ink)" }, svg);
+  el("text", { x: X(st) + 12, y: Y(st) - 6, class: "lbl-strong" }, svg, "Start");
+  el("circle", { cx: X(en), cy: Y(en), r: 5, fill: "var(--surface)", stroke: "var(--ink)", "stroke-width": 2 }, svg);
+  el("text", { x: X(en) + 12, y: Y(en) + 14, class: "lbl-strong" }, svg, "Ziel");
+  el("text", { x: W - P, y: H - 6, "text-anchor": "end" }, svg, "N ↑");
+})();
+
+// Profil: Puls oben, Höhe unten
+(function () {
+  const svg = $("profile"), W = 440, L = 40, R = 12;
+  const maxD = pts[pts.length - 1][1];
+  const x = d => L + d / maxD * (W - L - R);
+  // Puls mit Zonenbändern
+  const t1 = 10, b1 = 230, hLo = 100, hHi = 200, yh = h => t1 + (hHi - h) / (hHi - hLo) * (b1 - t1);
+  const bands = [[189, 200, "var(--z5)"], [174, 188.99, "var(--z4)"], [158, 173.99, "var(--z3)"], [127, 157.99, "var(--z2)"], [100, 126.99, "var(--z1)"]];
+  bands.forEach(([a, b, c]) => el("rect", { x: L, y: yh(b), width: W - L - R, height: yh(a) - yh(b), fill: c, opacity: 0.13 }, svg));
+  [120, 140, 160, 180, 200].forEach(h => el("text", { x: L - 6, y: yh(h) + 4, "text-anchor": "end" }, svg, h));
+  el("polyline", { points: pts.filter(p => p[2] > 0).map(p => x(p[1]) + "," + yh(p[2])).join(" "), fill: "none", stroke: "var(--onion)", "stroke-width": 1.8, "stroke-linejoin": "round" }, svg);
+  el("text", { x: L, y: t1 - 2 }, svg, "Puls (bpm)");
+  // Höhe
+  const t2 = 270, b2 = 390, aLo = 210, aHi = 235, ya = a => t2 + (aHi - a) / (aHi - aLo) * (b2 - t2);
+  [210, 220, 230].forEach(a => { el("line", { x1: L, x2: W - R, y1: ya(a), y2: ya(a), stroke: "var(--grid)" }, svg); el("text", { x: L - 6, y: ya(a) + 4, "text-anchor": "end" }, svg, a); });
+  const line = pts.map(p => x(p[1]) + "," + ya(p[3])).join(" ");
+  el("polygon", { points: `${x(0)},${b2} ${line} ${x(maxD)},${b2}`, fill: "var(--skin-soft)" }, svg);
+  el("polyline", { points: line, fill: "none", stroke: "var(--skin)", "stroke-width": 1.8 }, svg);
+  el("text", { x: L, y: t2 - 6 }, svg, "Höhe (m)");
+  for (let km = 0; km <= 11; km += 2) el("text", { x: x(km * 1000), y: b2 + 18, "text-anchor": "middle" }, svg, km + " km");
+})();
+
+// Zonen
+(function () {
+  const names = ["Z1 Erholung", "Z2 Grundlage", "Z3 Tempo", "Z4 Schwelle", "Z5 Anaerob"], ranges = ["< 127", "127–157", "158–173", "174–188", "≥ 189"];
+  const z = DATA.zones, tot = z.reduce((a, b) => a + b, 0);
+  $("zonebar").innerHTML = z.map((s, i) => `<div style="width:${s / tot * 100}%;background:var(--z${i + 1})" title="${names[i]}"></div>`).join("");
+  $("zones").innerHTML = z.map((s, i) => `<div><span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--z${i + 1});margin-right:6px"></i>${names[i]}</span><b>${fmt(s)}</b><span>${de(s / tot * 100)} % · ${ranges[i]} bpm</span></div>`).join("");
+  $("zone-txt").textContent = `${de((z[3] + z[4]) / tot * 100)} % der Zeit lag dein Puls über 174, davon ${fmt(z[4])} Minuten im roten Bereich ab 189. Ab Minute ${Math.round(DATA.firstZ5 / 60)} kamst du kaum noch unter 180.`;
+})();
+
+// Segmente
+$("segs").innerHTML = DATA.segments.map(s => {
+  const d = s.a - s.b;
+  return `<tr><td>${s.name}</td><td class="n">${de(s.len)} m</td><td class="n">${fmt(s.a)} <span style="color:var(--muted)">· ${s.ha}</span></td><td class="n">${s.b ? fmt(s.b) + ' <span style="color:var(--muted)">· ' + s.hb + "</span>" : "–"}</td><td class="n">${s.b ? `<span class="${d > 0 ? "delta" : ""}">${d > 0 ? "−" : "+"}${fmt(Math.abs(d))}</span>` : `<span class="pill">einmal</span>`}</td></tr>`;
+}).join("") + `<tr><td colspan="5" style="color:var(--muted);font-size:12px">Zeit · Ø Puls. Durchgang A ist jeweils der mit niedrigerem Puls, also vermutlich die erste Runde.</td></tr>`;
+
+// Bestzeiten
+$("efforts").innerHTML = DATA.efforts.map(([n, s]) => `<div class="effort"><span>${n}</span><b>${fmt(s)}</b><em>${fmt(s / (DATA.effDist[n] / 1000))} /km</em></div>`).join("");
+
+// Funfacts
+$("facts").innerHTML = DATA.facts.map(([b, p]) => `<div class="fact"><b>${b}</b><p>${p}</p></div>`).join("");
+</script>

@@ -18,6 +18,8 @@
   --swim: #1baf7a;
   --other: #898781;
   --run-soft: rgba(42,120,214,0.14);
+  --race: #7b3fc4;
+  --race-soft: rgba(123,63,196,0.12);
   --good: #006300;
   --good-bg: rgba(12,163,12,0.10);
   --warn-ink: #8a5a00;
@@ -30,7 +32,7 @@
   :root:not([data-theme="light"]) {
     --bg: #0f110e; --surface: #181a17; --ink: #f4f5f1; --ink-2: #c3c6bb; --muted: #8b8f84;
     --grid: #2a2d28; --axis: #3a3d36; --ring: rgba(255,255,255,0.10);
-    --run: #3987e5; --ride: #d95926; --swim: #199e70; --other: #898781; --run-soft: rgba(57,135,229,0.20);
+    --run: #3987e5; --ride: #d95926; --swim: #199e70; --other: #898781; --run-soft: rgba(57,135,229,0.20); --race: #a77ef0; --race-soft: rgba(167,126,240,0.16);
     --good: #3cc23c; --good-bg: rgba(12,163,12,0.16); --warn-ink: #f2c04a; --warn-bg: rgba(250,178,25,0.14);
     color-scheme: dark;
   }
@@ -38,7 +40,7 @@
 :root[data-theme="dark"] {
   --bg: #0f110e; --surface: #181a17; --ink: #f4f5f1; --ink-2: #c3c6bb; --muted: #8b8f84;
   --grid: #2a2d28; --axis: #3a3d36; --ring: rgba(255,255,255,0.10);
-  --run: #3987e5; --ride: #d95926; --swim: #199e70; --other: #898781; --run-soft: rgba(57,135,229,0.20);
+  --run: #3987e5; --ride: #d95926; --swim: #199e70; --other: #898781; --run-soft: rgba(57,135,229,0.20); --race: #a77ef0; --race-soft: rgba(167,126,240,0.16);
   --good: #3cc23c; --good-bg: rgba(12,163,12,0.16); --warn-ink: #f2c04a; --warn-bg: rgba(250,178,25,0.14);
   color-scheme: dark;
 }
@@ -146,8 +148,51 @@ footer { font-size: 13px; color: var(--muted); }
 .hbar .val { font-family: var(--font-data); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
 .hbar.best .val { color: var(--good); font-weight: 500; }
 
+/* Jahresendlauf: Wochen als Baukasten ohne feste Wochentage */
+.paces { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.pace { display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border-left: 3px solid var(--c); background: var(--surface); border-radius: 0 8px 8px 0; min-width: 0; }
+.pace b { font-family: var(--font-data); font-size: 15px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.pace span { font-size: 13px; color: var(--ink-2); }
+.rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.combo { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.combo span { font-family: var(--font-data); font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--race-soft); color: var(--ink); }
+.weeks { display: flex; flex-direction: column; gap: 10px; }
+.week { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; }
+.week.now { border-color: var(--race); box-shadow: 0 0 0 1px var(--race); }
+.week.past summary .wk-title { color: var(--ink-2); }
+.week summary { list-style: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; padding: 14px 18px; }
+.week summary::-webkit-details-marker { display: none; }
+.wk-head { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wk-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; line-height: 1.1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.wk-title .tag { font-family: var(--font-data); font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 99px; letter-spacing: 0.04em; text-transform: uppercase; background: var(--grid); color: var(--ink-2); }
+.wk-title .tag.now { background: var(--race); color: var(--surface); }
+.wk-sub { font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+.wk-prog { display: flex; align-items: center; gap: 10px; font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+.wk-bar { width: 72px; height: 6px; background: var(--grid); border-radius: 3px; overflow: hidden; }
+.wk-bar i { display: block; height: 100%; background: var(--race); }
+.wk-body { padding: 0 18px 16px; display: flex; flex-direction: column; gap: 8px; }
+.wk-body > p { font-size: 13px; color: var(--ink-2); }
+.unit { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 10px 12px; border-radius: 8px; background: var(--bg); cursor: pointer; }
+.unit input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--race); cursor: pointer; }
+.unit .u-txt { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.unit .u-txt b { font-weight: 600; }
+.unit .u-txt small { font-size: 13px; color: var(--ink-2); }
+.unit .u-kind { font-family: var(--font-data); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.u-kind.q { background: var(--warn-bg); color: var(--warn-ink); }
+.u-kind.l { background: var(--run-soft); color: var(--run); }
+.u-kind.ll { background: var(--race-soft); color: var(--race); }
+.u-kind.o { background: var(--grid); color: var(--ink-2); }
+.u-kind.r { background: var(--race); color: var(--surface); }
+.unit.done .u-txt b { text-decoration: line-through; text-decoration-color: var(--muted); }
+.unit:has(input:focus-visible) { outline: 2px solid var(--race); outline-offset: 1px; }
+.profile-wrap { overflow-x: auto; }
+.chart svg .sec-lbl { fill: var(--ink-2); font-size: 11px; }
+
 @media (max-width: 720px) {
   .tiles.three { grid-template-columns: minmax(0, 1fr); }
+  .paces { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rules { grid-template-columns: minmax(0, 1fr); }
+  .week summary { grid-template-columns: minmax(0, 1fr); }
   .hbar { grid-template-columns: minmax(0, 1fr) 70px; }
   .hbar .track { grid-column: 1 / -1; grid-row: 2; }
   .tabbar button { font-size: 18px; padding-inline: 10px; }
@@ -172,6 +217,7 @@ footer { font-size: 13px; color: var(--muted); }
     <button role="tab" id="tab-laufen" aria-controls="laufen" aria-selected="false" tabindex="-1" style="--c:var(--run)"><i></i>Laufen <span class="count" id="cRun"></span></button>
     <button role="tab" id="tab-radfahren" aria-controls="radfahren" aria-selected="false" tabindex="-1" style="--c:var(--ride)"><i></i>Radfahren <span class="count" id="cRide"></span></button>
     <button role="tab" id="tab-schwimmen" aria-controls="schwimmen" aria-selected="false" tabindex="-1" style="--c:var(--swim)"><i></i>Schwimmen <span class="count" id="cSwim"></span></button>
+    <button role="tab" id="tab-jahresendlauf" aria-controls="jahresendlauf" aria-selected="false" tabindex="-1" style="--c:var(--race)"><i></i>Jahresendlauf <span class="count" id="cRace"></span></button>
   </nav>
 
   <!-- ============ GESAMT ============ -->
@@ -383,6 +429,101 @@ footer { font-size: 13px; color: var(--muted); }
     <section>
       <header><div class="eyebrow">Einheiten</div><h2>Alle Schwimmeinheiten</h2></header>
       <div class="tablewrap"><table id="swimTable"></table></div>
+    </section>
+  </div>
+
+  <!-- ============ JAHRESENDLAUF ============ -->
+  <div class="panel" id="jahresendlauf" role="tabpanel" aria-labelledby="tab-jahresendlauf" tabindex="0" hidden>
+    <div class="tiles" id="tilesRace"></div>
+
+    <section>
+      <header>
+        <div class="eyebrow">Strecke · Komoot-Tour</div>
+        <h2>Höhenprofil und Renntaktik</h2>
+        <p class="note">19,6 km, 275 hm hoch und runter, knapp ein Drittel Asphalt, der Rest Feld- und Waldwege. Bergauf sparst du Kraft, bergab ab km 11,5 holst du die Zeit.</p>
+      </header>
+      <div class="chart" id="profileChart">
+        <div class="legend"><span><i style="background:var(--race)"></i>Höhe über NN</span><span><i style="background:var(--warn-bg);outline:1px solid var(--warn-ink)"></i>Anstieg</span></div>
+      </div>
+      <div class="tablewrap"><table id="splitTable"></table></div>
+      <p class="note">Durchgangszeiten für 1:45 (ambitioniert) und 1:50 (sicher). Am Berg zählt der Puls, nicht die Uhr.</p>
+    </section>
+
+    <section>
+      <header>
+        <div class="eyebrow">Tempobereiche</div>
+        <h2>Wie schnell ist was?</h2>
+      </header>
+      <div class="paces">
+        <div class="pace" style="--c:var(--run)"><b>6:15–6:45 /km</b><span>Locker und langer Lauf. Puls unter ca. 157, du kannst dich unterhalten.</span></div>
+        <div class="pace" style="--c:var(--race)"><b>5:05–5:10 /km</b><span>Renntempo. Zügig, aber 20 km lang haltbar.</span></div>
+        <div class="pace" style="--c:var(--warn-ink)"><b>4:40–4:50 /km</b><span>Intervalle. Hart, aber kontrolliert.</span></div>
+        <div class="pace" style="--c:var(--ride)"><b>nach Gefühl</b><span>Bergintervalle. Zügig bergauf (6–8 %), locker zurück.</span></div>
+      </div>
+    </section>
+
+    <section>
+      <header>
+        <div class="eyebrow">Flexibel planen</div>
+        <h2>Deine Woche, deine Tage</h2>
+        <p class="note">Jede Woche hat feste Einheiten, aber keine festen Wochentage. Du legst sie so, wie es in deine Woche passt. Fest steht nur das Rennen am Samstag, 12.12.</p>
+      </header>
+      <div class="rules">
+        <div class="vcol good">
+          <h3><span class="mark">✓</span>So verteilst du die Einheiten</h3>
+          <ul>
+            <li><strong>Nie zwei harte Tage hintereinander.</strong> Qualität und langer Lauf brauchen mindestens einen lockeren Tag oder Ruhetag dazwischen.</li>
+            <li><strong>Der lange Lauf passt gut ans Wochenende,</strong> muss aber nicht dort liegen.</li>
+            <li><strong>Mögliche Wochen:</strong>
+              <div class="combo"><span>Di · Do · So</span><span>Mi · Fr · So</span><span>Mo · Mi · Sa</span><span>Di · Fr · So</span></div>
+            </li>
+            <li><strong>Radfahren oder Inliner</strong> können den optionalen lockeren Lauf ersetzen.</li>
+          </ul>
+        </div>
+        <div class="vcol mixed">
+          <h3><span class="mark">!</span>Wenn die Woche nicht aufgeht</h3>
+          <ul>
+            <li><strong>Was zuerst zählt:</strong> langer Lauf, dann Qualität, dann locker, dann optional. Bei nur zwei Läufen machst du die ersten beiden.</li>
+            <li><strong>Nicht nachholen:</strong> Eine verpasste Einheit fällt aus. Nie zwei Einheiten an einem Tag oder hart an zwei Tagen in Folge.</li>
+            <li><strong>Nach Krankheit oder über 5 Tagen Pause:</strong> den langen Lauf auf den Wert der Vorwoche setzen und die Qualität weglassen.</li>
+            <li><strong>Schmerz, der beim Laufen stärker wird:</strong> aufhören und pausieren.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <header>
+        <div class="eyebrow">Trainingsplan · 13.10. bis 12.12.2026</div>
+        <h2>Woche für Woche</h2>
+        <p class="note">Hake ab, was erledigt ist. Die Häkchen speichert nur dieser Browser. Die aktuelle Woche ist hervorgehoben und aufgeklappt.</p>
+      </header>
+      <div class="weeks" id="weeks"></div>
+    </section>
+
+    <section>
+      <header>
+        <div class="eyebrow">Renntag</div>
+        <h2>Am 12.12.</h2>
+      </header>
+      <div class="verdict">
+        <div class="vcol good">
+          <h3><span class="mark">→</span>Tempo</h3>
+          <ul>
+            <li><strong>km 0–5 bremsen:</strong> etwa 5:45 /km, Puls unter ca. 170. Hier verschenken die meisten das Rennen.</li>
+            <li><strong>Anstieg km 8–10:</strong> kurze Schritte, aufrecht, Arme mitnehmen. 6:30 /km und langsamer ist okay.</li>
+            <li><strong>Ab km 11,5:</strong> es geht lange sanft bergab. Hier läufst du unter 5:00 /km und holst die Zeit.</li>
+          </ul>
+        </div>
+        <div class="vcol mixed">
+          <h3><span class="mark">!</span>Ausrüstung und Verpflegung</h3>
+          <ul>
+            <li><strong>Schuhe:</strong> Zwei Drittel sind Feld- und Waldwege. Teste bis Ende November, ob dein Schuh auf nassem Schotter und Laub genug Grip hat.</li>
+            <li><strong>Gel:</strong> eins um km 10–12, also oben nach dem Anstieg. Vorher bei den langen Läufen ausprobieren.</li>
+            <li><strong>Kälte:</strong> lieber etwas zu dünn starten und vorher 10–15 min warmlaufen.</li>
+          </ul>
+        </div>
+      </div>
     </section>
   </div>
 
@@ -668,8 +809,143 @@ const RAW=[["2023-12-09T18:14","Workout","Abendtraining",0,8885,0,null],["2023-1
   activityTable("rideTable", allRides, anyTempo, false);
   activityTable("swimTable", swims, anyTempo, false);
 
+  // ---------- Jahresendlauf ----------
+  // Höhe alle 100 m entlang der Komoot-Tour „Jahresendlauf 20 km“ (19,6 km, 275 hm)
+  const PROFILE = [273,280,290,300,305,309,308,307,303,299,297,301,309,317,322,328,333,338,340,341,341,344,347,351,353,355,354,349,345,341,338,339,341,344,345,343,339,338,341,345,349,352,355,359,364,368,372,374,377,378,379,381,381,380,379,378,376,375,374,372,370,366,363,360,356,352,348,345,341,338,336,335,335,333,331,329,328,327,326,326,328,333,340,347,356,364,372,377,381,386,390,394,399,403,406,408,411,414,416,419,419,417,415,412,409,406,404,405,406,410,413,415,416,417,418,416,414,410,408,406,403,401,402,402,402,401,400,399,398,397,397,398,400,401,402,403,403,401,396,390,384,383,383,382,382,381,379,378,377,376,374,373,370,366,363,360,356,352,348,345,341,338,336,335,335,333,331,329,328,327,326,325,326,326,324,322,319,315,313,310,307,304,302,300,297,295,296,299,303,307,308,309,306,301,292,281,274];
+  const RACE_KM = 19.6;
+  const RACE_DAY = new Date(2026, 11, 12);
+  const altAt = (km) => { const i = Math.min(PROFILE.length - 1, km * 10); const lo = Math.floor(i), hi = Math.min(PROFILE.length - 1, lo + 1); return PROFILE[lo] + (PROFILE[hi] - PROFILE[lo]) * (i - lo); };
+  const climb = (a, b) => { let up = 0, dn = 0; for (let i = Math.round(a * 10); i < Math.round(b * 10) && i + 1 < PROFILE.length; i++) { const d = PROFILE[i + 1] - PROFILE[i]; if (d > 0) up += d; else dn -= d; } return { up, dn }; };
+  const SECTIONS = [
+    { a: 0, b: 5, name: "Start bis km 5", what: "gleichmäßig bergauf", pace: 345, climb: true, short: "bremsen" },
+    { a: 5, b: 8, name: "km 5–8", what: "bergab", pace: 305, short: "rollen" },
+    { a: 8, b: 10, name: "km 8–10", what: "der Anstieg, bis 8 %", pace: 390, climb: true, short: "Anstieg" },
+    { a: 10, b: 11.5, name: "km 10–11,5", what: "oben, höchster Punkt", pace: 315, short: "oben" },
+    { a: 11.5, b: 18, name: "km 11,5–18", what: "lang und sanft bergab", pace: 298, short: "Zeit holen" },
+    { a: 18, b: RACE_KM, name: "km 18 bis Ziel", what: "kleine Welle, dann steil runter", pace: 295, short: "Endspurt" }
+  ];
+  const fmtClock = (s) => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), r = s % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(r).padStart(2, "0"); };
+
+  function drawProfile() {
+    const c = $("profileChart"); c.querySelectorAll("svg,.tip").forEach(n => n.remove());
+    const W = widthOf(c), H = 250, m = { l: 46, r: 10, t: 26, b: 26 };
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Höhenprofil der Strecke" }); c.appendChild(svg);
+    const g = el("g", { transform: `translate(${m.l},${m.t})` }, svg);
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const aMin = 260, aMax = 430;
+    const x = (km) => km / RACE_KM * iw;
+    const y = (a) => ih - (a - aMin) / (aMax - aMin) * ih;
+    SECTIONS.filter(s => s.climb).forEach(s => el("rect", { x: x(s.a), y: 0, width: x(s.b) - x(s.a), height: ih, fill: "var(--warn-bg)" }, g));
+    for (let a = 280; a <= 420; a += 40) { el("line", { x1: 0, x2: iw, y1: y(a), y2: y(a), stroke: "var(--grid)" }, g); el("text", { x: -6, y: y(a) + 4, "text-anchor": "end" }, g).textContent = a + " m"; }
+    const stepKm = W < 500 ? 5 : 2;
+    for (let k = 0; k <= RACE_KM; k += stepKm) el("text", { x: x(k), y: ih + 16, "text-anchor": k === 0 ? "start" : "middle" }, g).textContent = k + " km";
+    const pts = PROFILE.map((a, i) => [x(Math.min(i / 10, RACE_KM)), y(a)]);
+    const line = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
+    el("path", { d: line + ` L${x(RACE_KM)},${ih} L0,${ih} Z`, fill: "var(--race-soft)" }, g);
+    el("path", { d: line, fill: "none", stroke: "var(--race)", "stroke-width": 2, "stroke-linejoin": "round" }, g);
+    el("line", { x1: 0, x2: iw, y1: ih, y2: ih, stroke: "var(--axis)" }, g);
+    SECTIONS.forEach((s, i) => {
+      if (i) el("line", { x1: x(s.a), x2: x(s.a), y1: -6, y2: ih, stroke: "var(--axis)", "stroke-dasharray": "2 3" }, g);
+      if (W >= 560 || s.climb || i === 4) el("text", { x: (x(s.a) + x(s.b)) / 2, y: -10, "text-anchor": "middle", class: "sec-lbl" }, g).textContent = s.short;
+    });
+    const top = PROFILE.indexOf(Math.max(...PROFILE));
+    el("circle", { cx: x(top / 10), cy: y(PROFILE[top]), r: 4, fill: "var(--race)", stroke: "var(--surface)", "stroke-width": 2 }, g);
+    el("text", { x: x(top / 10) + 8, y: y(PROFILE[top]) + 4, class: "lbl-strong" }, g).textContent = PROFILE[top] + " m";
+    const tip = makeTip(c);
+    const cursor = el("line", { x1: 0, x2: 0, y1: 0, y2: ih, stroke: "var(--ink-2)", "stroke-width": 1, visibility: "hidden" }, g);
+    const hit = el("rect", { x: 0, y: 0, width: iw, height: ih, fill: "transparent" }, g);
+    hit.addEventListener("mousemove", (e) => {
+      const r = svg.getBoundingClientRect(); const px = (e.clientX - r.left) * (W / r.width) - m.l;
+      const km = Math.max(0, Math.min(RACE_KM, px / iw * RACE_KM)); const a = altAt(km);
+      const s = SECTIONS.find(q => km >= q.a && km <= q.b);
+      cursor.setAttribute("x1", x(km)); cursor.setAttribute("x2", x(km)); cursor.setAttribute("visibility", "visible");
+      showTip(tip, c, svg, m.l + x(km), m.t + y(a), `<b>km ${fmtNum(km, 1)} · ${Math.round(a)} m</b><br><span class="t-sub">${s.name}: ${s.what}</span>`);
+    });
+    hit.addEventListener("mouseleave", () => { tip.hidden = true; cursor.setAttribute("visibility", "hidden"); });
+  }
+
+  (function splitTable() {
+    const total = SECTIONS.reduce((t, s) => t + (s.b - s.a) * s.pace, 0);
+    const f50 = 6600 / total; let cum = 0;
+    let html = `<thead><tr><th>Abschnitt</th><th style="text-align:left">Profil</th><th>Höhe</th><th>Tempo</th><th>Bei 1:45</th><th>Bei 1:50</th></tr></thead><tbody>`;
+    SECTIONS.forEach(s => {
+      const h = climb(s.a, s.b); cum += (s.b - s.a) * s.pace;
+      html += `<tr><td>${s.name}</td><td style="text-align:left">${s.what}</td><td>+${h.up} / −${h.dn} m</td><td>${fmtPace(s.pace)} /km</td><td>${fmtClock(cum)}</td><td>${fmtClock(cum * f50)}</td></tr>`;
+    });
+    $("splitTable").innerHTML = html + "</tbody>";
+  })();
+
+  // Wochen beginnen montags. Einheiten haben bewusst keinen Wochentag.
+  // kind: q = Qualität, l = locker, ll = langer Lauf, o = optional, r = Rennen
+  const PLAN = [
+    { start: "2026-10-13", title: "Erholung", note: "Erholung nach dem Zwiebelmarktlauf. Nur ganz locker.", units: [
+      ["l", "5 km ganz locker", "6:30 /km oder langsamer"], ["l", "5 km ganz locker", "gern mit Hund oder Begleitung"]] },
+    { start: "2026-10-19", title: "Woche 1", units: [
+      ["q", "6 × 800 m @ 4:45", "2 min Trabpause, je 2 km ein- und auslaufen, ca. 8 km"], ["l", "6 km locker", ""], ["ll", "12 km langer Lauf", "auf km 0–6 der Strecke, hin und zurück"], ["o", "5 km locker oder Rad", "optional"]] },
+    { start: "2026-10-26", title: "Woche 2", units: [
+      ["q", "Berg: 8 × 75 s", "zügig bergauf (6–8 %), locker zurück"], ["l", "6 km locker", ""], ["ll", "14 km langer Lauf", "hügelige Runde, viel Feldweg"], ["o", "5 km locker oder Rad", "optional"]] },
+    { start: "2026-11-02", title: "Woche 3", units: [
+      ["q", "3 × 2 km @ 5:10", "2 min Pause, ca. 10 km"], ["l", "7 km locker", ""], ["ll", "15 km langer Lauf", "mit dem Anstieg von km 8–10 der Strecke"], ["o", "5 km locker oder Rad", "optional"]] },
+    { start: "2026-11-09", title: "Woche 4", tag: "leicht", note: "Entlastungswoche. Weniger Umfang, damit der Körper die letzten Wochen verarbeitet.", units: [
+      ["q", "Berg: 6 × 60 s", "zügig bergauf, locker zurück"], ["l", "5 km locker", ""], ["ll", "12 km locker", ""]] },
+    { start: "2026-11-16", title: "Woche 5", units: [
+      ["q", "3 × 3 km @ 5:10", "3 min Pause, auf welliger Strecke, ca. 13 km"], ["l", "7 km locker", ""], ["ll", "16 km langer Lauf", "zweite Streckenhälfte, letzte 4 km bergab im Renntempo"], ["o", "5 km locker oder Rad", "optional"]] },
+    { start: "2026-11-23", title: "Woche 6", tag: "Generalprobe", units: [
+      ["q", "Berg: 10 × 75 s", "zügig bergauf, locker zurück"], ["l", "7 km locker", ""], ["ll", "Die ganze Strecke, 19,6 km locker", "Schuhe, Gel und Kleidung wie am Renntag testen"], ["o", "5 km locker oder Rad", "optional"]] },
+    { start: "2026-11-30", title: "Woche 7", units: [
+      ["q", "2 × 4 km @ 5:10", "3 min Pause, ca. 12 km"], ["l", "6 km locker", ""], ["ll", "14 km langer Lauf", "km 12–18 der Strecke im Renntempo (bergab)"]] },
+    { start: "2026-12-07", title: "Rennwoche", tag: "Taper", note: "Weniger laufen, frisch werden. Die Qualität spätestens am Mittwoch, den lockeren Lauf 1–2 Tage vor dem Rennen.", units: [
+      ["q", "6 km mit 4 × 1 km @ 5:10", "bis spätestens Mittwoch"], ["l", "4 km locker + 3 Steigerungen", "1–2 Tage vor dem Rennen"], ["r", "Jahresendlauf, 19,6 km", "Samstag, 12.12. · der einzige feste Termin"]] }
+  ];
+  const KIND = { q: "Qualität", l: "Locker", ll: "Lang", o: "Optional", r: "Rennen" };
+  // Wochenumfang ohne optionale Einheit, inklusive Ein- und Auslaufen
+  const KM = { "Erholung": 10, "Woche 1": 26, "Woche 2": 28, "Woche 3": 32, "Woche 4": 24, "Woche 5": 36, "Woche 6": 35, "Woche 7": 32, "Rennwoche": 30 };
+  const keyOf = (w, u) => "jel-" + PLAN[w].start + "-" + u;
+  const isDone = (k) => { try { return localStorage.getItem(k) === "1"; } catch (e) { return false; } };
+  const setDone = (k, v) => { try { v ? localStorage.setItem(k, "1") : localStorage.removeItem(k); } catch (e) {} };
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const dayMs = 86400000;
+  const weekRange = (w) => { const s = new Date(PLAN[w].start + "T00:00"); const e = w + 1 < PLAN.length ? new Date(new Date(PLAN[w + 1].start + "T00:00") - dayMs) : RACE_DAY; return [s, e]; };
+  const fmtShort = (d) => d.getDate() + "." + (d.getMonth() + 1) + ".";
+
+  function renderWeeks() {
+    $("weeks").innerHTML = PLAN.map((wk, w) => {
+      const [s, e] = weekRange(w);
+      const state = today > e ? "past" : today >= s ? "now" : "next";
+      const units = wk.units.map(([k, t, sub], u) => {
+        const id = keyOf(w, u); const done = isDone(id);
+        return `<label class="unit${done ? " done" : ""}" for="${id}"><input type="checkbox" id="${id}"${done ? " checked" : ""}><span class="u-txt"><b>${t}</b>${sub ? `<small>${sub}</small>` : ""}</span><span class="u-kind ${k}">${KIND[k]}</span></label>`;
+      }).join("");
+      const tags = (state === "now" ? `<span class="tag now">Diese Woche</span>` : "") + (wk.tag ? `<span class="tag">${wk.tag}</span>` : "");
+      return `<details class="week ${state}" data-w="${w}"${state === "now" ? " open" : ""}><summary><span class="wk-head"><span class="wk-title">${wk.title}${tags}</span><span class="wk-sub">${fmtShort(s)} bis ${fmtShort(e)} · ≈ ${KM[wk.title]} km · ${wk.units.length} Einheiten</span></span><span class="wk-prog"><span class="wk-bar"><i></i></span><span class="wk-count"></span></span></summary><div class="wk-body">${wk.note ? `<p>${wk.note}</p>` : ""}${units}</div></details>`;
+    }).join("");
+    $("weeks").querySelectorAll("input[type=checkbox]").forEach(cb => cb.addEventListener("change", () => {
+      setDone(cb.id, cb.checked); cb.closest(".unit").classList.toggle("done", cb.checked); updateProgress();
+    }));
+    updateProgress();
+  }
+  function updateProgress() {
+    let all = 0, done = 0;
+    $("weeks").querySelectorAll(".week").forEach(d => {
+      const boxes = [...d.querySelectorAll("input")]; const n = boxes.filter(b => b.checked).length;
+      all += boxes.length; done += n;
+      d.querySelector(".wk-bar i").style.width = (n / boxes.length * 100) + "%";
+      d.querySelector(".wk-count").textContent = n + "/" + boxes.length;
+    });
+    const days = Math.round((RACE_DAY - today) / dayMs);
+    const top = PROFILE.indexOf(Math.max(...PROFILE));
+    tiles("tilesRace", [
+      { label: "Bis zum Start", value: days > 0 ? days : 0, unit: days === 1 ? "Tag" : "Tage", delta: "Sa, 12.12.2026 · Bad Berka", flat: true },
+      { label: "Strecke", value: "19,6", unit: "km", delta: "275 hm · höchster Punkt " + PROFILE[top] + " m", flat: true },
+      { label: "Zielzeit", value: "1:45", unit: "h", delta: "sicher: unter 1:50", flat: true },
+      { label: "Plan erledigt", value: done, unit: "/ " + all, delta: done ? Math.round(done / all * 100) + " % der Einheiten" : "noch nichts abgehakt", flat: !done }
+    ]);
+    $("cRace").textContent = days > 0 ? days + " T" : "";
+  }
+  renderWeeks();
+
   // ---------- Tabs ----------
-  const draws = { gesamt: [drawVolume], laufen: [drawPace, drawRunVol], radfahren: [drawRides, drawRideVol], schwimmen: [] };
+  const draws = { gesamt: [drawVolume], laufen: [drawPace, drawRunVol], radfahren: [drawRides, drawRideVol], schwimmen: [], jahresendlauf: [drawProfile] };
   const tabs = [...document.querySelectorAll('[role="tab"]')];
   let current = "gesamt";
   function select(id, focus) {
